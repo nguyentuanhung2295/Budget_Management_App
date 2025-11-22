@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="18dp"
+    android:background="#FFFFFF">
+
+    <!-- CATEGORY + AMOUNT (dòng 1) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:background="#F0F0F0"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_vertical"
+        android:elevation="2dp"
+        android:radius="8dp"
+        android:textSize="16sp"
+        android:orientation="horizontal">
+
+        <!-- Category -->
+        <TextView
+            android:id="@+id/tvItemCategory"
+            android:layout_width="2dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="10"
+            android:text="Category"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="#333333"
+            tools:ignore="HardcodedText,InefficientWeight" />
+
+        <!-- Amount (income/expense) -->
+        <TextView
+            android:id="@+id/tvItemAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="100000"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="#009688"/>
+    </LinearLayout>
+
+    <!-- DATE (dòng 2) -->
+    <TextView
+        android:id="@+id/tvItemDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="2025-01-20"
+        android:textSize="15sp"
+        android:textColor="#666666"
+        android:gravity="end"
+        android:layout_gravity="end"
+        android:layout_marginTop="5dp"/>
+
+    <!-- NOTE (dòng 3) -->
+    <TextView
+        android:id="@+id/tvItemNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Note content here..."
+        android:textSize="15sp"
+        android:textColor="#999999"
+        android:gravity="end"
+        android:layout_gravity="end"
+        android:layout_marginTop="5dp"/>
+
+    <!-- Divider line -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:background="#DDDDDD"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="8dp"/>
+</LinearLayout>
