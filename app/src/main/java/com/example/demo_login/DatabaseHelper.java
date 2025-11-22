@@ -10,7 +10,6 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "UserAuth.db";
-    // Version 2 để đảm bảo cột CodeVerify được tạo
     private static final int DATABASE_VERSION = 2;
 
     // Tên bảng và tên cột
