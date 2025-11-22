@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText regEmail, regPassword, regVerifyPassword, reg_verify_password;
+    private EditText regEmail, regPassword, regVerifyPassword, edtPassCode;
     private Button btnRegister;
     private DatabaseHelper dbHelper;
 
@@ -26,7 +26,7 @@ public class RegisterActivity extends AppCompatActivity {
         regEmail = findViewById(R.id.reg_email);
         regPassword = findViewById(R.id.reg_password);
         regVerifyPassword = findViewById(R.id.reg_verify_password);
-        reg_verify_password = findViewById(R.id.edtCodePass);
+        edtPassCode = findViewById(R.id.edtCodePass);
         btnRegister = findViewById(R.id.btn_register);
         TextView tv_back_to_login = findViewById(R.id.tv_back_to_login);
 
@@ -45,7 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
         String email = regEmail.getText().toString().trim();
         String pass = regPassword.getText().toString().trim();
         String verifyPass = regVerifyPassword.getText().toString().trim();
-        String codePass = reg_verify_password.getText().toString().trim();
+        String codePass = edtPassCode.getText().toString().trim();
 
 
         // 1. Kiểm tra đầu vào

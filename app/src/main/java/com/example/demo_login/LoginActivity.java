@@ -13,6 +13,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText loginEmail, loginPassword;
     private Button btnLogin;
     private DatabaseHelper dbHelper;
+    private TextView tvRegisterNow, tvForgotPass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +28,8 @@ public class LoginActivity extends AppCompatActivity {
         loginEmail = findViewById(R.id.login_email);
         loginPassword = findViewById(R.id.login_password);
         btnLogin = findViewById(R.id.btn_login);
-        TextView tvRegisterNow = findViewById(R.id.tv_register_now);
+        tvRegisterNow = findViewById(R.id.tv_register_now);
+        tvForgotPass = findViewById(R.id.tvForgotPass);
 
         // Thiết lập sự kiện cho nút ĐĂNG NHẬP
         btnLogin.setOnClickListener(v -> handleLogin());
@@ -36,10 +38,8 @@ public class LoginActivity extends AppCompatActivity {
         tvRegisterNow.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
-            // Không gọi finish() ở đây, để người dùng có thể quay lại
         });
         // Event Update password
-        TextView tvForgotPass = findViewById(R.id.tvForgotPass);
         tvForgotPass.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);

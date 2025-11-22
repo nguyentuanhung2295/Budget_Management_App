@@ -39,14 +39,14 @@
                 android:text="Expense"
                 android:gravity="center"
                 android:textColor="@android:color/white"
-                android:background="#e65100"/> <TextView
+                android:background="@drawable/tab_selected_bg"/> <TextView
             android:id="@+id/tab_income"
             android:layout_width="90dp"
             android:layout_height="match_parent"
             android:text="Income"
             android:gravity="center"
-            android:textColor="@android:color/white"/>
-        </LinearLayout>
+            android:textColor="@android:color/black"
+            android:background="@drawable/tab_unselected_bg"/> </LinearLayout>
     </LinearLayout>
 
     <ScrollView
@@ -66,13 +66,48 @@
                 android:gravity="center_vertical"
                 android:layout_marginBottom="10dp">
 
-                <CalendarView
-                    android:id="@+id/calendarView"
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-            </LinearLayout>
+                    android:text="Date"
+                    android:textSize="16sp"
+                    android:paddingEnd="10dp"/>
 
+                <ImageButton
+                    android:id="@+id/btn_prev_day"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@null"
+                    android:contentDescription="Previous Day"
+                    android:src="@drawable/ic_arrow_left" />
+
+                <TextView
+                    android:id="@+id/tv_selected_date"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="2025.11.22 (Sat)"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageButton
+                    android:id="@+id/btn_next_day"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@null"
+                    android:contentDescription="Next Day"
+                    android:src="@drawable/ic_arrow_right" />
+
+                <ImageButton
+                    android:id="@+id/btn_open_calendar"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@null"
+                    android:contentDescription="Open Calendar"
+                    android:src="@drawable/ic_calendar_icon" />
+
+            </LinearLayout>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -92,13 +127,13 @@
                 <EditText
                     android:id="@+id/et_expense_value"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:textSize="24sp"
-                    android:text="50000"
-                    android:inputType="numberDecimal"
                     android:background="@null"
-                    android:textColor="#ff9800"/>
+                    android:inputType="numberDecimal"
+                    android:text="50000"
+                    android:textColor="#ff9800"
+                    android:textSize="24sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -121,7 +156,8 @@
                 android:columnCount="3"
                 android:rowCount="3"
                 android:alignmentMode="alignBounds"
-                android:columnOrderPreserved="false">
+                android:columnOrderPreserved="false"
+                android:useDefaultMargins="false">
 
                 <include layout="@layout/item_category_icon" android:id="@+id/cat_food" />
                 <include layout="@layout/item_category_icon" android:id="@+id/cat_houseware" />
@@ -145,12 +181,12 @@
             <EditText
                 android:id="@+id/et_note"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
+                android:background="@android:color/white"
+                android:elevation="1dp"
                 android:hint="Enter value"
                 android:inputType="text"
-                android:background="@android:color/white"
-                android:padding="10dp"
-                android:elevation="1dp"/>
+                android:padding="10dp" />
 
         </LinearLayout>
     </ScrollView>

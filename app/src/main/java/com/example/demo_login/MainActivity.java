@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Ánh xạ Views
-        tvDate = findViewById(R.id.tv_date);
+        tvDate = findViewById(R.id.tv_selected_date);
         tabExpense = findViewById(R.id.tab_expense);
         tabIncome = findViewById(R.id.tab_income);
         etExpenseValue = findViewById(R.id.et_expense_value);
