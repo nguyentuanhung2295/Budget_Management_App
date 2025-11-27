@@ -10,9 +10,11 @@ import android.widget.Toast;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText regEmail, regPassword, regVerifyPassword, edtPassCode;
+    private EditText regName, regEmail, regPassword, regVerifyPassword, edtPassCode;
     private Button btnRegister;
     private DatabaseHelper dbHelper;
+    private TextView tv_back_to_login;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +25,7 @@ public class RegisterActivity extends AppCompatActivity {
         dbHelper = new DatabaseHelper(this);
 
         // Ánh xạ Views từ Layout
+        regName = findViewById(R.id.reg_name);
         regEmail = findViewById(R.id.reg_email);
         regPassword = findViewById(R.id.reg_password);
         regVerifyPassword = findViewById(R.id.reg_verify_password);
@@ -42,6 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void handleRegistration() {
+        String name = regName.getText().toString().trim();
         String email = regEmail.getText().toString().trim();
         String pass = regPassword.getText().toString().trim();
         String verifyPass = regVerifyPassword.getText().toString().trim();
@@ -49,7 +53,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 
         // 1. Kiểm tra đầu vào
-        if (email.isEmpty() || pass.isEmpty() || verifyPass.isEmpty() || codePass.isEmpty()) {
+        if (name.isEmpty() || email.isEmpty() || pass.isEmpty() || verifyPass.isEmpty() || codePass.isEmpty()) {
             Toast.makeText(this, "Vui lòng điền đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -67,7 +71,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         // 4. Thêm người dùng vào CSDL
-        long result = dbHelper.addUser(email, pass, codePass);
+        long result = dbHelper.addUser(name, email, pass, codePass);
 
         if (result > 0) {
             Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_LONG).show();

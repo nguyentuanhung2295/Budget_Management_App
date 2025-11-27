@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="REGISTER ACCOUNT"
-        android:textSize="24sp"
+        android:layout_marginBottom="30dp"
         android:gravity="center"
-        android:layout_marginBottom="30dp" />
+        android:text="REGISTER ACCOUNT"
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/reg_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Your Name"
+        android:inputType="text" />
 
     <EditText
         android:id="@+id/reg_email"
@@ -32,9 +39,9 @@
         android:id="@+id/reg_verify_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
         android:hint="Verify Password"
-        android:inputType="textPassword"
-        android:layout_marginBottom="20dp" />
+        android:inputType="textPassword" />
 
     <EditText
         android:id="@+id/edtCodePass"
@@ -55,9 +62,9 @@
         android:id="@+id/tv_back_to_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Back to Login"
-        android:padding="10dp"
         android:layout_gravity="center_horizontal"
-        android:textColor="@android:color/holo_blue_dark"
-        android:clickable="true"/>
+        android:clickable="true"
+        android:padding="10dp"
+        android:text="Back to Login"
+        android:textColor="@android:color/holo_blue_dark" />
 </LinearLayout>

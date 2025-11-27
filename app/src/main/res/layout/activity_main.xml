@@ -1,193 +1,325 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="#f5f5f5"
     tools:context=".MainActivity">
 
-    <LinearLayout
+    <include
+        android:id="@+id/main_footer_nav"
+        layout="@layout/activity_footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ff9800"
-        android:paddingTop="20dp"
-        android:paddingBottom="10dp"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Easy to log"
-            android:textColor="@android:color/white"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="10dp"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:background="@drawable/tab_background"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/tab_expense"
-                android:layout_width="90dp"
-                android:layout_height="match_parent"
-                android:text="Expense"
-                android:gravity="center"
-                android:textColor="@android:color/white"
-                android:background="@drawable/tab_selected_bg"/> <TextView
-            android:id="@+id/tab_income"
-            android:layout_width="90dp"
-            android:layout_height="match_parent"
-            android:text="Income"
-            android:gravity="center"
-            android:textColor="@android:color/black"
-            android:background="@drawable/tab_unselected_bg"/> </LinearLayout>
-    </LinearLayout>
+        android:layout_alignParentBottom="true"
+        android:elevation="8dp"/>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_above="@id/main_footer_nav">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
+            <!-- HEADER -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="10dp">
+                android:background="#ff9800"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="20dp"
+                android:paddingBottom="10dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Date"
-                    android:textSize="16sp"
-                    android:paddingEnd="10dp"/>
-
-                <ImageButton
-                    android:id="@+id/btn_prev_day"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@null"
-                    android:contentDescription="Previous Day"
-                    android:src="@drawable/ic_arrow_left" />
-
-                <TextView
-                    android:id="@+id/tv_selected_date"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="2025.11.22 (Sat)"
-                    android:textSize="16sp"
+                    android:layout_marginBottom="10dp"
+                    android:text="Easy to log"
+                    android:textColor="@android:color/white"
+                    android:textSize="28sp"
                     android:textStyle="bold" />
 
-                <ImageButton
-                    android:id="@+id/btn_next_day"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@null"
-                    android:contentDescription="Next Day"
-                    android:src="@drawable/ic_arrow_right" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:background="@drawable/tab_background"
+                    android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/btn_open_calendar"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@null"
-                    android:contentDescription="Open Calendar"
-                    android:src="@drawable/ic_calendar_icon" />
+                    <TextView
+                        android:id="@+id/tab_expense"
+                        android:layout_width="90dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/tab_selected_bg"
+                        android:gravity="center"
+                        android:text="Expense"
+                        android:textColor="@android:color/white" />
 
+                    <TextView
+                        android:id="@+id/tab_income"
+                        android:layout_width="90dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/tab_unselected_bg"
+                        android:gravity="center"
+                        android:text="Income"
+                        android:textColor="@android:color/black" />
+
+                </LinearLayout>
             </LinearLayout>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Expense"
-                android:textSize="16sp"
-                android:layout_marginTop="10dp"/>
 
+            <!-- CONTENT -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@android:color/white"
-                android:padding="10dp"
-                android:layout_marginBottom="20dp"
-                android:elevation="2dp">
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <EditText
-                    android:id="@+id/et_expense_value"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:inputType="numberDecimal"
-                    android:text="50000"
-                    android:textColor="#ff9800"
-                    android:textSize="24sp" />
+                <!-- DATE -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingEnd="10dp"
+                        android:text="Date"
+                        android:textSize="16sp" />
+
+                    <ImageButton
+                        android:id="@+id/btn_prev_day"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@null"
+                        android:contentDescription="Previous Day"
+                        android:src="@drawable/ic_arrow_left" />
+
+                    <TextView
+                        android:id="@+id/tv_selected_date"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="2025.11.22 (Sat)"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <ImageButton
+                        android:id="@+id/btn_next_day"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@null"
+                        android:contentDescription="Next Day"
+                        android:src="@drawable/ic_arrow_right" />
+
+                    <ImageButton
+                        android:id="@+id/btn_open_calendar"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@null"
+                        android:contentDescription="Open Calendar"
+                        android:src="@drawable/ic_calendar_icon" />
+
+                </LinearLayout>
+
+                <!-- EXPENSE VALUE -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="VND"
-                    android:textSize="16sp"/>
+                    android:layout_marginTop="10dp"
+                    android:text="Expense"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:background="@android:color/white"
+                    android:elevation="2dp"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+                    <EditText
+                        android:id="@+id/et_expense_value"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:inputType="numberDecimal"
+                        android:text="50000"
+                        android:textColor="#ff9800"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="VND"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <!-- CATEGORY -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="Category"
+                    android:textSize="16sp" />
+
+                <GridLayout
+                    android:id="@+id/category_grid_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="3"
+                    android:alignmentMode="alignBounds"
+                    android:useDefaultMargins="true">
+
+                    <RadioButton
+                        android:id="@+id/rdHealth"
+                        style="@style/CategoryRadioButton"
+                        android:layout_width="70dp"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="center"
+                        android:drawableTop="@drawable/ic_food"
+                        android:text="Health" />
+
+                    <RadioButton
+                        android:id="@+id/rdEdu"
+                        style="@style/CategoryRadioButton"
+                        android:layout_width="80dp"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="center"
+                        android:drawableTop="@drawable/ic_food"
+                        android:text="Education" />
+
+                    <RadioButton
+                        android:id="@+id/rdVehicle"
+                        style="@style/CategoryRadioButton"
+                        android:layout_width="70dp"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="center"
+                        android:text="Vehicle"
+                        android:drawableTop="@drawable/ic_food" />
+
+                    <RadioButton
+                        android:id="@+id/rdPhone"
+                        style="@style/CategoryRadioButton"
+                        android:layout_width="70dp"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="center"
+                        android:text="Phone"
+                        android:drawableTop="@drawable/ic_food" />
+
+                    <RadioButton
+                        android:id="@+id/rdRent"
+                        style="@style/CategoryRadioButton"
+                        android:layout_width="70dp"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="center"
+                        android:text="Rent"
+                        android:drawableTop="@drawable/ic_food" />
+
+                    <RadioButton
+                        android:id="@+id/rdSave"
+                        style="@style/CategoryRadioButton"
+                        android:layout_width="70dp"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="center"
+                        android:text="Saving"
+                        android:drawableTop="@drawable/ic_food" />
+
+                    <RadioButton
+                        android:id="@+id/rdPetrol"
+                        style="@style/CategoryRadioButton"
+                        android:layout_width="70dp"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="center"
+                        android:text="Petrol"
+                        android:drawableTop="@drawable/ic_food" />
+
+                    <RadioButton
+                        android:id="@+id/rdParking"
+                        style="@style/CategoryRadioButton"
+                        android:layout_width="70dp"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="center"
+                        android:text="Parking"
+                        android:drawableTop="@drawable/ic_food" />
+
+                    <RadioButton
+                        android:id="@+id/rdInvest"
+                        style="@style/CategoryRadioButton"
+                        android:layout_width="70dp"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="center"
+                        android:text="Invest"
+                        android:drawableTop="@drawable/ic_food" />
+
+                    <RadioButton
+                        android:id="@+id/rdCharity"
+                        style="@style/CategoryRadioButton"
+                        android:layout_width="70dp"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="center"
+                        android:text="Charity"
+                        android:drawableTop="@drawable/ic_food" />
+
+                    <RadioButton
+                        android:id="@+id/rdFsB"
+                        style="@style/CategoryRadioButton"
+                        android:layout_width="70dp"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="center"
+                        android:text="FsB"
+                        android:drawableTop="@drawable/ic_food" />
+
+                    <RadioButton
+                        android:id="@+id/rdLifestyle"
+                        style="@style/CategoryRadioButton"
+                        android:layout_width="70dp"
+                        android:layout_columnWeight="1"
+                        android:layout_gravity="center"
+                        android:text="Lifestyle"
+                        android:drawableTop="@drawable/ic_food" />
+
+                </GridLayout>
+
+                <!-- NOTE -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Note"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/edtNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@android:color/white"
+                    android:elevation="1dp"
+                    android:hint="Enter value"
+                    android:inputType="text"
+                    android:padding="10dp" />
+
+                <!-- BUTTON -->
+                <Button
+                    android:id="@+id/btnEnter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="20dp"
+                    android:text="Enter" />
+
             </LinearLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Category"
-                android:textSize="16sp"
-                android:layout_marginBottom="10dp"/>
-
-            <GridLayout
-                android:id="@+id/category_grid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="3"
-                android:rowCount="3"
-                android:alignmentMode="alignBounds"
-                android:columnOrderPreserved="false"
-                android:useDefaultMargins="false">
-
-                <include layout="@layout/item_category_icon" android:id="@+id/cat_food" />
-                <include layout="@layout/item_category_icon" android:id="@+id/cat_houseware" />
-                <include layout="@layout/item_category_icon" android:id="@+id/cat_clothes" />
-                <include layout="@layout/item_category_icon" android:id="@+id/cat_cosmetic" />
-                <include layout="@layout/item_category_icon" android:id="@+id/cat_medical" />
-                <include layout="@layout/item_category_icon" android:id="@+id/cat_education" />
-                <include layout="@layout/item_category_icon" android:id="@+id/cat_transport" />
-                <include layout="@layout/item_category_icon" android:id="@+id/cat_electric" />
-                <include layout="@layout/item_category_icon" android:id="@+id/cat_exchange" />
-
-            </GridLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Note"
-                android:textSize="16sp"
-                android:layout_marginTop="20dp"/>
-
-            <EditText
-                android:id="@+id/et_note"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@android:color/white"
-                android:elevation="1dp"
-                android:hint="Enter value"
-                android:inputType="text"
-                android:padding="10dp" />
-
         </LinearLayout>
     </ScrollView>
-</LinearLayout>
+</RelativeLayout>

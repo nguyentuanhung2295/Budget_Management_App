@@ -57,16 +57,16 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         // 2. Kiểm tra thông tin đăng nhập với CSDL
-        boolean loginSuccess = dbHelper.checkCredentials(email, pass);
+        int userId = dbHelper.checkCredentials(email, pass);
 
-        if (loginSuccess) {
+        if (userId != -1) { // Đăng nhập thành công
             Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_LONG).show();
 
-            //Chuyển sang màn hình mainActivity
+            // ⭐ BƯỚC 2: Tạo Intent và đính kèm userId
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent.putExtra("EXTRA_USER_ID", userId); // Đính kèm userId
             startActivity(intent);
-            //finish(); // Đóng LoginActivity sau khi đăng nhập thành công
-
+            finish();
         } else {
             Toast.makeText(this, "Email hoặc Mật khẩu không đúng.", Toast.LENGTH_SHORT).show();
         }

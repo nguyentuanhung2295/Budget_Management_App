@@ -5,5 +5,29 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
+    <!-- Style tùy chỉnh để RadioButton trông giống ImageButton/Icon -->
+    <style name="CategoryRadioButton">
+        <!-- Kích thước và Margin tương đương với ImageButton cũ -->
+        <item name="android:layout_width">80dp</item>
+        <item name="android:layout_height">90dp</item>
+        <item name="android:layout_margin">10dp</item>
+
+        <!-- Loại bỏ hình tròn Radio Button mặc định -->
+        <item name="android:button">@null</item>
+
+        <!-- Căn giữa nội dung (text và icon) -->
+        <item name="android:gravity">center</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+
+        <!-- Màu sắc và kích thước văn bản -->
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:background">@drawable/category_hover_effect</item>
+
+        <!-- Kích thước Icon (được đặt bởi drawableTop) -->
+        <!-- Bạn cần đảm bảo drawableTop (ic_food) được căn giữa và có kích thước phù hợp (Ví dụ: 48dp) -->
+    </style>
+
     <style name="Theme.Demo_Login" parent="Base.Theme.Demo_Login" />
 </resources>
