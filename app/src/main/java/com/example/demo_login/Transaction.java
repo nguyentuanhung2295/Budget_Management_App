@@ -17,7 +17,6 @@ public class Transaction {
         this.date = date;
         this.type = type;
     }
-    // ⭐ THÊM HÀM NÀY ĐỂ SỬA LỖI ⭐
     public int getId() {
         return id;
     }

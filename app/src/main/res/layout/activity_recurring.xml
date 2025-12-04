@@ -26,7 +26,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Budget Settings"
+                android:text="Recurring Expenses"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:textColor="#333333"
@@ -53,7 +53,7 @@
                         android:textStyle="bold"
                         android:layout_marginBottom="5dp"/>
                     <Spinner
-                        android:id="@+id/spBudgetCategory"
+                        android:id="@+id/spRecurCategory"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:background="@android:drawable/btn_dropdown"
@@ -62,17 +62,30 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Limit Amount"
+                        android:text="Amount"
                         android:textStyle="bold"
                         android:layout_marginBottom="5dp"/>
                     <EditText
-                        android:id="@+id/etBudgetAmount"
+                        android:id="@+id/etRecurAmount"
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:background="@drawable/edittext_border"
                         android:paddingHorizontal="10dp"
-                        android:hint="Ex: 5000000"
+                        android:hint="0"
                         android:inputType="numberDecimal"
+                        android:layout_marginBottom="15dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Frequency"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="5dp"/>
+                    <Spinner
+                        android:id="@+id/spFrequency"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@android:drawable/btn_dropdown"
                         android:layout_marginBottom="15dp"/>
 
                     <LinearLayout
@@ -82,48 +95,58 @@
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:layout_marginEnd="8dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Month"
+                                android:text="Start Date"
                                 android:textStyle="bold"/>
-                            <Spinner
-                                android:id="@+id/spMonth"
+                            <TextView
+                                android:id="@+id/tvStartDate"
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
-                                android:background="@android:drawable/btn_dropdown"/>
+                                android:background="@drawable/edittext_border"
+                                android:gravity="center_vertical"
+                                android:paddingStart="10dp"
+                                android:text="Select"
+                                android:drawableEnd="@drawable/ic_calendar_icon"
+                                android:paddingEnd="10dp"/>
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_height="wrap_content"
                             android:orientation="vertical"
                             android:layout_marginStart="8dp">
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Year"
+                                android:text="End Date"
                                 android:textStyle="bold"/>
-                            <Spinner
-                                android:id="@+id/spYear"
+                            <TextView
+                                android:id="@+id/tvEndDate"
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
-                                android:background="@android:drawable/btn_dropdown"/>
+                                android:background="@drawable/edittext_border"
+                                android:gravity="center_vertical"
+                                android:paddingStart="10dp"
+                                android:text="Optional"
+                                android:drawableEnd="@drawable/ic_calendar_icon"
+                                android:paddingEnd="10dp"/>
                         </LinearLayout>
                     </LinearLayout>
 
                     <Button
-                        android:id="@+id/btnSaveBudget"
+                        android:id="@+id/btnSaveRecur"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
-                        android:text="SAVE LIMIT"
-                        android:backgroundTint="#972344"
+                        android:text="Schedule Expense"
+                        android:backgroundTint="#2196F3"
                         android:textColor="#FFFFFF"
                         android:textStyle="bold"/>
                 </LinearLayout>
@@ -132,14 +155,14 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Active Budgets"
+                android:text="Active Schedules"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#333333"
                 android:layout_marginBottom="10dp"/>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_budget"
+                android:id="@+id/rvRecurring"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"/>

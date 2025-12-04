@@ -36,10 +36,10 @@ public class FooterActivity extends AppCompatActivity {
         btnExpense.setOnClickListener(v -> navigate(activity, ExpenseActivity.class, currentUserId));
 
         // 3. Chuyển sang ReportActivity
-        //btnReport.setOnClickListener(v -> navigate(activity, ReportActivity.class, currentUserId));
+        btnReport.setOnClickListener(v -> navigate(activity, ReportedActivity.class, currentUserId));
 
         // 4. Chuyển sang SettingActivity
-        //btnSetting.setOnClickListener(v -> navigate(activity, SettingActivity.class, currentUserId));
+        btnSetting.setOnClickListener(v -> navigate(activity, SettingActivity.class, currentUserId));
     }
 
     // Hàm chuyển Activity chung

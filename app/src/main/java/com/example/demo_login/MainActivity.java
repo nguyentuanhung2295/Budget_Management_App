@@ -15,6 +15,10 @@ import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import java.util.concurrent.TimeUnit;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -89,6 +93,21 @@ public class MainActivity extends AppCompatActivity {
 
         // ⭐ 4. Kiểm tra xem có phải đang Edit không
         checkEditMode();
+
+        // ⭐ THIẾT LẬP WORKER CHẠY NGẦM ⭐
+        // Worker sẽ chạy ít nhất mỗi 15 phút (giới hạn nhỏ nhất của Android) để kiểm tra
+        // Tuy nhiên, logic bên trong Worker sẽ chỉ trừ tiền nếu ngày hiện tại >= ngày hẹn.
+
+        PeriodicWorkRequest recurringRequest = new PeriodicWorkRequest.Builder(
+                RecurringCheckWorker.class,
+                24, TimeUnit.HOURS) // Kiểm tra mỗi 24 giờ
+                .build();
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "RecurringExpenseCheck",
+                ExistingPeriodicWorkPolicy.KEEP, // Nếu đã có lịch rồi thì giữ nguyên, không tạo mới
+                recurringRequest
+        );
     }
 
     // --- LOGIC EDIT ---
@@ -165,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         selectedCategoryRadioButton.setChecked(true);
     }
 
-    // ⭐ SỬA HÀM HANDLE ENTER ĐỂ HỖ TRỢ UPDATE
+    // ⭐ HÀM XỬ LÝ NÚT ENTER (ĐÃ SỬA LOGIC CHUYỂN TRANG)
     private void handleEnter() {
         String amountStr = etExpenseValue.getText().toString().trim();
         String note = edtNote.getText().toString().trim();
@@ -198,32 +217,32 @@ public class MainActivity extends AppCompatActivity {
                         transactionDate,
                         transType
                 );
-                if (success) Toast.makeText(this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
             } else {
                 // Gọi hàm INSERT (Cũ)
                 success = addTransaction(currentUserId, amount, categoryText, note, transactionDate, transType);
-                if (success) Toast.makeText(this, "Lưu thành công!", Toast.LENGTH_SHORT).show();
             }
 
             if (success) {
-                // Reset UI
-                etExpenseValue.setText("");
-                edtNote.setText("");
-                if (selectedCategoryRadioButton != null) {
-                    selectedCategoryRadioButton.setChecked(false);
-                    selectedCategoryRadioButton = null;
+                String warningMessage = null;
+
+                // 1. Kiểm tra hạn mức (Chỉ nếu là Expense)
+                if ("expense".equalsIgnoreCase(transType)) {
+                    warningMessage = dbHelper.checkAndNotifyBudgetExceeded(currentUserId, categoryText, transactionDate);
                 }
 
-                isEditMode = false;
-                btnEnter.setText("Enter");
-
-                // Chuyển về ExpenseActivity
-                Intent intent = new Intent(MainActivity.this, ExpenseActivity.class);
-                intent.putExtra("EXTRA_USER_ID", currentUserId);
-                // Xóa cờ history để tránh loop
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
+                // 2. Xử lý hiển thị và điều hướng
+                if (warningMessage != null) {
+                    // 🚨 TRƯỜNG HỢP CÓ CẢNH BÁO:
+                    // Hiện Dialog và KHÔNG chuyển trang ngay lập tức.
+                    // Việc chuyển trang sẽ được thực hiện khi người dùng bấm nút trong Dialog.
+                    showBudgetWarningDialog(warningMessage);
+                } else {
+                    // ✅ TRƯỜNG HỢP BÌNH THƯỜNG:
+                    // Hiện Toast và chuyển trang ngay lập tức.
+                    String msg = isEditMode ? "Cập nhật thành công!" : "Lưu thành công!";
+                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+                    resetUIAndNavigate();
+                }
             } else {
                 Toast.makeText(this, "Lỗi khi lưu/cập nhật.", Toast.LENGTH_SHORT).show();
             }
@@ -231,6 +250,43 @@ public class MainActivity extends AppCompatActivity {
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Số tiền không hợp lệ.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    // ⭐ HÀM HIỂN THỊ CẢNH BÁO (ĐÃ SỬA)
+    private void showBudgetWarningDialog(String message) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("⚠️ CẢNH BÁO VƯỢT HẠN MỨC")
+                .setMessage(message)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setCancelable(false) // Bắt buộc người dùng phải tương tác với nút
+                .setNegativeButton("Đã hiểu", (dialog, which) -> {
+                    dialog.dismiss();
+                    // ⭐ CHUYỂN TRANG TẠI ĐÂY (Sau khi người dùng đã đọc và bấm nút)
+                    resetUIAndNavigate();
+                })
+                .show();
+    }
+
+    // ⭐ HÀM PHỤ TRỢ: RESET UI VÀ CHUYỂN TRANG
+    private void resetUIAndNavigate() {
+        // 1. Xóa dữ liệu trên Form
+        etExpenseValue.setText("");
+        edtNote.setText("");
+        if (selectedCategoryRadioButton != null) {
+            selectedCategoryRadioButton.setChecked(false);
+            selectedCategoryRadioButton = null;
+        }
+
+        isEditMode = false;
+        btnEnter.setText("Enter");
+
+        // 2. Chuyển sang màn hình ExpenseActivity
+        Intent intent = new Intent(MainActivity.this, ExpenseActivity.class);
+        intent.putExtra("EXTRA_USER_ID", currentUserId);
+        // Xóa cờ history để khi bấm Back ở màn hình kia không quay lại form nhập liệu này
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private boolean addTransaction(int userId, double amount, String categoryName, String note, String date, String type) {

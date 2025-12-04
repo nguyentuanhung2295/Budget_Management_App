@@ -23,6 +23,11 @@
         <activity android:name=".ForgotPasswordActivity" />
         <activity android:name=".ExpenseActivity" />
         <activity android:name=".FooterActivity" />
+        <activity android:name=".ReportedActivity" />
+        <activity android:name=".BudgetActivity" />
+        <activity android:name=".SettingActivity" />
+        <activity android:name=".RecurringActivity" />
+        <activity android:name=".NotificationActivity" />
 
     </application>
 

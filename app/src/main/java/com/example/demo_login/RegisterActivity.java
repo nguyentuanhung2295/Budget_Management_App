@@ -70,7 +70,17 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // 4. Thêm người dùng vào CSDL
+        // 4. Check code pass to correctly just integer
+        try {
+            // Cố gắng chuyển đổi chuỗi sang số nguyên
+            int code = Integer.parseInt(codePass);
+        } catch (NumberFormatException e) {
+            // Nếu lỗi (không phải số), hiển thị thông báo
+            Toast.makeText(this, "Mã xác thực phải là số nguyên", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 5. Thêm người dùng vào CSDL
         long result = dbHelper.addUser(name, email, pass, codePass);
 
         if (result > 0) {

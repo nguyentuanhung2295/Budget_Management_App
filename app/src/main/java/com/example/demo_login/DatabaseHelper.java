@@ -374,4 +374,361 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return result > 0;
     }
+
+    /**
+     * Lấy danh sách tổng hợp số tiền theo từng danh mục (để vẽ biểu đồ).
+     * @param type "income" hoặc "expense"
+     */
+    public Cursor getCategoryReport(int userId, int month, int year, String type) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String monthStr = String.format("%02d", month);
+        String yearStr = String.valueOf(year);
+
+        // SELECT category, SUM(amount) FROM TransactionTable
+        // WHERE ... GROUP BY category
+        String query = "SELECT " + COL_TRANS_CAT_NAME + ", SUM(" + COL_TRANS_AMOUNT + ") as total " +
+                "FROM " + TABLE_TRANSACTION +
+                " WHERE " + COL_USER_ID + "=? AND " + COL_TRANS_TYPE + "=?" +
+                " AND strftime('%m', " + COL_TRANS_DATE + ") = ? " +
+                " AND strftime('%Y', " + COL_TRANS_DATE + ") = ? " +
+                " GROUP BY " + COL_TRANS_CAT_NAME;
+
+        return db.rawQuery(query, new String[]{String.valueOf(userId), type, monthStr, yearStr});
+    }
+
+    /**
+     * Lấy danh sách giao dịch lọc theo Type (Income/Expense) để hiển thị list.
+     */
+    public List<Transaction> getTransactionsByType(int userId, int month, int year, String type) {
+        List<Transaction> transactionList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String monthStr = String.format("%02d", month);
+        String yearStr = String.valueOf(year);
+
+        String query = "SELECT * FROM " + TABLE_TRANSACTION +
+                " WHERE " + COL_USER_ID + " = ? " +
+                " AND " + COL_TRANS_TYPE + " = ? " + // Thêm điều kiện lọc Type
+                " AND strftime('%m', " + COL_TRANS_DATE + ") = ? " +
+                " AND strftime('%Y', " + COL_TRANS_DATE + ") = ? " +
+                " ORDER BY " + COL_TRANS_DATE + " DESC";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), type, monthStr, yearStr});
+
+        if (cursor.moveToFirst()) {
+            do {
+                // ... (Copy logic đọc Transaction cũ vào đây) ...
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_TRANS_ID));
+                double amount = cursor.getDouble(cursor.getColumnIndexOrThrow(COL_TRANS_AMOUNT));
+                String category = cursor.getString(cursor.getColumnIndexOrThrow(COL_TRANS_CAT_NAME));
+                String desc = cursor.getString(cursor.getColumnIndexOrThrow(COL_TRANS_DESC));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow(COL_TRANS_DATE));
+                String tType = cursor.getString(cursor.getColumnIndexOrThrow(COL_TRANS_TYPE));
+                transactionList.add(new Transaction(id, amount, category, desc, date, tType));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return transactionList;
+    }
+
+    // 1. Hàm lưu Budget (Upsert)
+    public boolean setBudget(int userId, String category, double maxAmount, int month, int year) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COL_USER_ID, userId);
+        cv.put(COL_BUDGET_CAT_NAME, category);
+        cv.put(COL_BUDGET_MAX, maxAmount);
+        cv.put(COL_MONTH, month);
+        cv.put(COL_YEAR, year);
+
+        // Kiểm tra xem đã có bản ghi chưa
+        String whereClause = COL_USER_ID + "=? AND " + COL_BUDGET_CAT_NAME + "=? AND " + COL_MONTH + "=? AND " + COL_YEAR + "=?";
+        String[] whereArgs = {String.valueOf(userId), category, String.valueOf(month), String.valueOf(year)};
+
+        int rows = db.update(TABLE_BUDGET, cv, whereClause, whereArgs);
+
+        if (rows == 0) {
+            // Chưa có -> Insert
+            long result = db.insert(TABLE_BUDGET, null, cv);
+            db.close();
+            return result != -1;
+        }
+
+        db.close();
+        return true; // Update thành công
+    }
+
+    // 2. Hàm lấy danh sách Budget của User (Mới)
+    public List<Budget> getBudgets(int userId) {
+        List<Budget> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Sắp xếp theo Năm giảm dần, sau đó đến Tháng giảm dần
+        String query = "SELECT * FROM " + TABLE_BUDGET +
+                " WHERE " + COL_USER_ID + " = ? " +
+                " ORDER BY " + COL_YEAR + " DESC, " + COL_MONTH + " DESC";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_BUDGET_ID));
+                String cat = cursor.getString(cursor.getColumnIndexOrThrow(COL_BUDGET_CAT_NAME));
+                double amount = cursor.getDouble(cursor.getColumnIndexOrThrow(COL_BUDGET_MAX));
+                int m = cursor.getInt(cursor.getColumnIndexOrThrow(COL_MONTH));
+                int y = cursor.getInt(cursor.getColumnIndexOrThrow(COL_YEAR));
+
+                list.add(new Budget(id, cat, amount, m, y));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return list;
+    }
+    // Hàm xóa Budget theo ID
+    public boolean deleteBudget(int budgetId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        // DELETE FROM BudgetLimit WHERE budgetLimitId = ?
+        int result = db.delete(TABLE_BUDGET, COL_BUDGET_ID + "=?", new String[]{String.valueOf(budgetId)});
+        db.close();
+        return result > 0;
+    }
+    // ⭐ HÀM MỚI: Lấy thông tin User theo ID để hiển thị ở Setting
+    public Cursor getUserById(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        // SELECT * FROM User WHERE userId = ?
+        return db.query(TABLE_USER, null, COL_USER_ID + "=?", new String[]{String.valueOf(userId)}, null, null, null);
+    }
+
+    // 1. Thêm khoản định kỳ mới
+    public boolean addRecurring(int userId, String category, double amount, String frequency, String startDate, String endDate, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_USER_ID, userId);
+        values.put(COL_RECUR_CAT_NAME, category);
+        values.put(COL_RECUR_AMOUNT, amount);
+        values.put(COL_FREQUENCY, frequency);
+        values.put(COL_START_DATE, startDate);
+        values.put(COL_END_DATE, endDate);
+        values.put(COL_STATUS, status); // Thường mặc định là "Active"
+
+        long result = db.insert(TABLE_RECURRING, null, values);
+        db.close();
+        return result != -1;
+    }
+
+    /**
+     * 1. Lấy tất cả khoản định kỳ đang Active của TẤT CẢ USER.
+     * (Dùng cho Worker chạy ngầm để quét và trừ tiền)
+     */
+    public List<RecurringExpense> getAllActiveRecurring() {
+        List<RecurringExpense> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query lấy tất cả các dòng có status là Active
+        String query = "SELECT * FROM " + TABLE_RECURRING + " WHERE " + COL_STATUS + " = 'Active'";
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                // ⭐ BƯỚC QUAN TRỌNG: Phải lấy dữ liệu từ Cursor ra biến trước
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_RECUR_ID));
+                int userId = cursor.getInt(cursor.getColumnIndexOrThrow(COL_USER_ID)); // Lấy UserID để biết trừ của ai
+                String category = cursor.getString(cursor.getColumnIndexOrThrow(COL_RECUR_CAT_NAME));
+                double amount = cursor.getDouble(cursor.getColumnIndexOrThrow(COL_RECUR_AMOUNT));
+                String frequency = cursor.getString(cursor.getColumnIndexOrThrow(COL_FREQUENCY));
+                String start = cursor.getString(cursor.getColumnIndexOrThrow(COL_START_DATE));
+                String end = cursor.getString(cursor.getColumnIndexOrThrow(COL_END_DATE));
+                String status = cursor.getString(cursor.getColumnIndexOrThrow(COL_STATUS));
+
+                // Tạo đối tượng với đầy đủ thông tin (bao gồm userId)
+                list.add(new RecurringExpense(id, userId, category, amount, frequency, start, end, status));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        // db.close(); // Giữ mở nếu cần
+        return list;
+    }
+
+    // 3. Xóa khoản định kỳ
+    public boolean deleteRecurring(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int result = db.delete(TABLE_RECURRING, COL_RECUR_ID + "=?", new String[]{String.valueOf(id)});
+        db.close();
+        return result > 0;
+    }
+
+    public void updateRecurringStartDate(int recurringId, String newDate) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_START_DATE, newDate);
+        db.update(TABLE_RECURRING, values, COL_RECUR_ID + "=?", new String[]{String.valueOf(recurringId)});
+        db.close();
+    }
+
+    /**
+     * 2. Lấy danh sách định kỳ của MỘT USER CỤ THỂ.
+     * (Dùng để hiển thị lên màn hình RecurringActivity)
+     */
+    public List<RecurringExpense> getRecurringList(int userIdInput) {
+        List<RecurringExpense> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT * FROM " + TABLE_RECURRING + " WHERE " + COL_USER_ID + " = ? ORDER BY " + COL_RECUR_ID + " DESC";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userIdInput)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                // Lấy dữ liệu từ Cursor
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_RECUR_ID));
+                int userId = cursor.getInt(cursor.getColumnIndexOrThrow(COL_USER_ID));
+                String category = cursor.getString(cursor.getColumnIndexOrThrow(COL_RECUR_CAT_NAME));
+                double amount = cursor.getDouble(cursor.getColumnIndexOrThrow(COL_RECUR_AMOUNT));
+                String frequency = cursor.getString(cursor.getColumnIndexOrThrow(COL_FREQUENCY));
+                String start = cursor.getString(cursor.getColumnIndexOrThrow(COL_START_DATE));
+                String end = cursor.getString(cursor.getColumnIndexOrThrow(COL_END_DATE));
+                String status = cursor.getString(cursor.getColumnIndexOrThrow(COL_STATUS));
+
+                // Tạo đối tượng
+                list.add(new RecurringExpense(id, userId, category, amount, frequency, start, end, status));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return list;
+    }
+
+    public boolean addTransaction(int userId, double amount, String categoryName, String note, String date, String type) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DatabaseHelper.COL_USER_ID, userId);
+        values.put(DatabaseHelper.COL_TRANS_AMOUNT, amount);
+        values.put(DatabaseHelper.COL_TRANS_CAT_NAME, categoryName);
+        values.put(DatabaseHelper.COL_TRANS_DESC, note);
+        values.put(DatabaseHelper.COL_TRANS_DATE, date);
+        values.put(DatabaseHelper.COL_TRANS_TYPE, type);
+        long result = db.insert(DatabaseHelper.TABLE_TRANSACTION, null, values);
+        db.close();
+        return result != -1;
+    }
+
+    //Notification
+    // 1. Hàm Thêm Thông Báo Mới
+    public void addNotification(int userId, String title, String message, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_USER_ID, userId);
+        values.put(COL_TITLE, title);
+        values.put(COL_MESSAGE, message);
+        values.put(COL_TRIGGER_DATE, date);
+        values.put(COL_IS_READ, 0);
+        long result = db.insert(TABLE_NOTIFICATION, null, values);
+        db.close();
+        Log.d("DB_NOTIF", "Added Notification result: " + result);
+    }
+
+    // 2. Hàm Lấy Danh Sách Thông Báo
+    public List<NotificationItem> getUserNotifications(int userId) {
+        List<NotificationItem> list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT * FROM " + TABLE_NOTIFICATION +
+                " WHERE " + COL_USER_ID + " = ? ORDER BY " + COL_NOTIF_ID + " DESC";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                String title = cursor.getString(cursor.getColumnIndexOrThrow(COL_TITLE));
+                String message = cursor.getString(cursor.getColumnIndexOrThrow(COL_MESSAGE));
+                String date = cursor.getString(cursor.getColumnIndexOrThrow(COL_TRIGGER_DATE));
+                list.add(new NotificationItem(title, message, date));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return list;
+    }
+
+    // 3. Hàm Kiểm Tra Hạn Mức (Lấy Budget Max của 1 danh mục trong tháng)
+    public double getBudgetLimit(int userId, String category, int month, int year) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        double limit = 0;
+
+        String query = "SELECT " + COL_BUDGET_MAX + " FROM " + TABLE_BUDGET +
+                " WHERE " + COL_USER_ID + "=? AND " + COL_BUDGET_CAT_NAME + "=? " +
+                " AND " + COL_MONTH + "=? AND " + COL_YEAR + "=?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), category, String.valueOf(month), String.valueOf(year)});
+
+        if (cursor.moveToFirst()) {
+            limit = cursor.getDouble(0);
+        }
+        cursor.close();
+        return limit; // Trả về 0 nếu chưa cài đặt hạn mức
+    }
+
+    // 4. Hàm tính tổng chi tiêu của 1 danh mục trong tháng (để so sánh)
+    public double getCategoryTotalExpense(int userId, String category, int month, int year) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String monthStr = String.format("%02d", month);
+
+        String query = "SELECT SUM(" + COL_TRANS_AMOUNT + ") FROM " + TABLE_TRANSACTION +
+                " WHERE " + COL_USER_ID + "=? AND " + COL_TRANS_CAT_NAME + "=? AND " + COL_TRANS_TYPE + "='expense'" +
+                " AND strftime('%m', " + COL_TRANS_DATE + ") = ? " +
+                " AND strftime('%Y', " + COL_TRANS_DATE + ") = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), category, monthStr, String.valueOf(year)});
+
+        double total = 0;
+        if (cursor.moveToFirst()) {
+            total = cursor.getDouble(0);
+        }
+        cursor.close();
+        return total;
+    }
+    /**
+     * Kiểm tra hạn mức, lưu thông báo vào DB và TRẢ VỀ nội dung cảnh báo để hiển thị lên UI.
+     * @return String: Nội dung cảnh báo nếu vượt, null nếu an toàn.
+     */
+    public String checkAndNotifyBudgetExceeded(int userId, String category, String dateStr) {
+        try {
+            // 1. Phân tích ngày (Giả định format yyyy-MM-dd từ MainActivity)
+            String[] parts = dateStr.split("-");
+            if (parts.length < 2) return null; // Tránh lỗi nếu định dạng ngày sai
+
+            int year = Integer.parseInt(parts[0]);
+            int month = Integer.parseInt(parts[1]);
+
+            // 2. Lấy hạn mức (Budget)
+            double limit = getBudgetLimit(userId, category, month, year);
+
+            // Nếu không đặt hạn mức hoặc hạn mức = 0 thì không cần kiểm tra
+            if (limit <= 0) return null;
+
+            // 3. Tính tổng chi tiêu thực tế của danh mục trong tháng này (Đã bao gồm khoản vừa thêm)
+            double currentTotal = getCategoryTotalExpense(userId, category, month, year);
+
+            // 4. So sánh: Nếu Tổng chi > Hạn mức
+            if (currentTotal > limit) {
+                // Tạo nội dung thông báo chi tiết
+                String message = String.format(java.util.Locale.US,
+                        "Danh mục '%s' đã vượt hạn mức tháng %02d/%d.\n\nĐã chi: %,.0f VND\nHạn mức: %,.0f VND\nVượt quá: %,.0f VND",
+                        category, month, year, currentTotal, limit, (currentTotal - limit));
+
+                // Lấy thời gian hiện tại để lưu vào lịch sử thông báo
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.US);
+                String now = sdf.format(java.util.Calendar.getInstance().getTime());
+
+                // 5. Lưu cảnh báo vào bảng Notification
+                addNotification(userId, "⚠️ Cảnh báo vượt hạn mức!", message, now);
+
+                Log.w("BUDGET_CHECK", "User " + userId + " exceeded budget for " + category);
+
+                // ⭐ TRẢ VỀ MESSAGE ĐỂ HIỂN THỊ LÊN MÀN HÌNH (DIALOG)
+                return message;
+            }
+
+        } catch (Exception e) {
+            Log.e("BUDGET_CHECK", "Error checking budget: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null; // Trả về null nếu không vượt hạn mức hoặc có lỗi
+    }
 }
