@@ -32,17 +32,14 @@ public class BudgetActivity extends AppCompatActivity {
 
         db = new DatabaseHelper(this);
 
-        // 1. Nhận User ID
         if (getIntent().hasExtra("EXTRA_USER_ID")) {
             currentUserId = getIntent().getIntExtra("EXTRA_USER_ID", -1);
         }
-        // Kiểm tra login
         if (currentUserId == -1) {
             finish();
             return;
         }
 
-        // 2. Ánh xạ Views
         spCategory = findViewById(R.id.spBudgetCategory);
         spMonth = findViewById(R.id.spMonth);
         spYear = findViewById(R.id.spYear);
@@ -50,21 +47,19 @@ public class BudgetActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btnSaveBudget);
         recyclerView = findViewById(R.id.recycler_budget);
 
-        // 3. Setup RecyclerView
+        // Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // 4. Load Data Spinner
+        // Load Data Spinner
         loadCategories();
         loadMonth();
         loadYear();
 
-        // 5. Load Danh sách Budget đã lưu
         loadBudgetList();
 
-        // 6. Sự kiện Lưu
         btnSave.setOnClickListener(v -> saveBudget());
 
-        // 7. Footer
+        // Footer
         FooterActivity.setupFooterListeners(this, currentUserId);
     }
 
@@ -88,17 +83,13 @@ public class BudgetActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spYear.setAdapter(adapter);
     }
-
-    // ⭐ HÀM LOAD DANH SÁCH (Đã sửa để truyền 'db' vào Adapter)
     private void loadBudgetList() {
         List<Budget> list = db.getBudgets(currentUserId);
 
         if (adapter == null) {
-            // Khởi tạo Adapter với context, list và db helper
             adapter = new BudgetAdapter(this, list, db);
             recyclerView.setAdapter(adapter);
         } else {
-            // Cập nhật dữ liệu nếu adapter đã tồn tại
             adapter.updateData(list);
         }
     }
@@ -121,8 +112,8 @@ public class BudgetActivity extends AppCompatActivity {
 
             if (ok) {
                 Toast.makeText(this, "Saved Successfully!", Toast.LENGTH_SHORT).show();
-                etBudgetAmount.setText(""); // Xóa input
-                loadBudgetList(); // Refresh danh sách bên dưới ngay lập tức
+                etBudgetAmount.setText("");
+                loadBudgetList();
             } else {
                 Toast.makeText(this, "Save Failed!", Toast.LENGTH_SHORT).show();
             }

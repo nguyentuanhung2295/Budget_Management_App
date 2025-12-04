@@ -1,44 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <LinearLayout
-        android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:orientation="horizontal"
+    android:background="#FFFFFF"
+    android:elevation="16dp"
+    android:weightSum="4"
+    android:gravity="center_vertical">
+
+    <ImageButton
+        android:id="@+id/footerMain"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:layout_margin="10dp"
-        android:orientation="horizontal">
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:srcCompat="@android:drawable/ic_menu_edit"
+        app:tint="#795548"
+        android:scaleType="centerInside"
+        android:contentDescription="Home" />
 
-        <ImageButton
-            android:id="@+id/footerMain"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="20dp"
-            app:srcCompat="@android:drawable/ic_menu_edit" />
+    <ImageButton
+        android:id="@+id/footerExpense"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:srcCompat="@android:drawable/ic_menu_agenda"
+        app:tint="#BCAAA4"
+        android:scaleType="centerInside"
+        android:contentDescription="Transactions" />
 
-        <ImageButton
-            android:id="@+id/footerExpense"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            app:srcCompat="@android:drawable/ic_menu_agenda" />
+    <ImageButton
+        android:id="@+id/footerReport"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Report"
+        android:scaleType="centerInside"
+        app:srcCompat="@android:drawable/ic_menu_sort_by_size"
+        app:tint="#BCAAA4" />
 
-        <ImageButton
-            android:id="@+id/footerReport"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            app:srcCompat="@android:drawable/ic_menu_sort_by_size" />
+    <ImageButton
+        android:id="@+id/footerSetting"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:srcCompat="@android:drawable/ic_menu_myplaces"
+        app:tint="#BCAAA4"
+        android:scaleType="centerInside"
+        android:contentDescription="Settings" />
 
-        <ImageButton
-            android:id="@+id/footerSetting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            app:srcCompat="@android:drawable/ic_menu_myplaces" />
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

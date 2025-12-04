@@ -15,10 +15,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // ----------------------------------------------------------------------
-    // 1. KHAI BÁO HẰNG SỐ CỘT VÀ BẢNG (ĐÃ BỎ CATEGORY)
+    // 1. DECLARE TABLE AND COLUMN CONSTANTS (CATEGORY REMOVED)
     // ----------------------------------------------------------------------
 
-    // Bảng 1: USERS
+    // Table 1: USERS
     public static final String TABLE_USER = "User";
     public static final String COL_USER_ID = "userId";
     public static final String COL_USERNAME = "userName";
@@ -27,24 +27,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_CREATED_AT = "created_at";
     public static final String COL_VERIFY_CODE = "codeVerify";
 
-    // Bảng 2: TRANSACTION (SỬA LẠI: Loại bỏ FK Category)
+    // Table 2: TRANSACTION (MODIFIED: Removed Category FK)
     public static final String TABLE_TRANSACTION = "TransactionTable";
     public static final String COL_TRANS_ID = "transactionId";
     public static final String COL_TRANS_AMOUNT = "amount";
     public static final String COL_TRANS_DESC = "description";
     public static final String COL_TRANS_DATE = "transactionDate";
     public static final String COL_TRANS_TYPE = "type";
-    public static final String COL_TRANS_CAT_NAME = "category"; // ⭐ Giữ tên Category trong bảng giao dịch
+    public static final String COL_TRANS_CAT_NAME = "category"; // ⭐ Keep Category Name in transaction table
 
-    // Bảng 3: BUDGET_LIMIT (SỬA LẠI: Loại bỏ FK Category)
+    // Table 3: BUDGET_LIMIT (MODIFIED: Removed Category FK)
     public static final String TABLE_BUDGET = "BudgetLimit";
     public static final String COL_BUDGET_ID = "budgetLimitId";
     public static final String COL_BUDGET_MAX = "maxAmount";
     public static final String COL_MONTH = "month";
     public static final String COL_YEAR = "year";
-    public static final String COL_BUDGET_CAT_NAME = "category"; // ⭐ Giữ tên Category trong bảng Budget
+    public static final String COL_BUDGET_CAT_NAME = "category"; // ⭐ Keep Category Name in Budget table
 
-    // Bảng 4: RECURRING_EXPENSE (SỬA LẠI: Loại bỏ FK Category)
+    // Table 4: RECURRING_EXPENSE (MODIFIED: Removed Category FK)
     public static final String TABLE_RECURRING = "RecurringExpense";
     public static final String COL_RECUR_ID = "recurringId";
     public static final String COL_RECUR_AMOUNT = "amount";
@@ -52,9 +52,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_START_DATE = "startDate";
     public static final String COL_END_DATE = "endDate";
     public static final String COL_STATUS = "status";
-    public static final String COL_RECUR_CAT_NAME = "category"; // ⭐ Giữ tên Category trong bảng Recurring
+    public static final String COL_RECUR_CAT_NAME = "category"; // ⭐ Keep Category Name in Recurring table
 
-    // Bảng 5: NOTIFICATION
+    // Table 5: NOTIFICATION
     public static final String TABLE_NOTIFICATION = "Notification";
     public static final String COL_NOTIF_ID = "notificationId";
     public static final String COL_TITLE = "title";
@@ -63,7 +63,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_IS_READ = "is_read";
 
     // ----------------------------------------------------------------------
-    // 2. CÂU LỆNH CREATE TABLE (ĐÃ LOẠI BỎ KHÓA NGOẠI CATEGORY)
+    // 2. CREATE TABLE STATEMENTS (CATEGORY FOREIGN KEY REMOVED)
     // ----------------------------------------------------------------------
 
     private static final String CREATE_TABLE_USER =
@@ -80,7 +80,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_TRANSACTION + " (" +
                     COL_TRANS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COL_USER_ID + " INTEGER NOT NULL, " +
-                    COL_TRANS_CAT_NAME + " TEXT NOT NULL, " + // ⭐ Dùng tên Category thay cho ID
+                    COL_TRANS_CAT_NAME + " TEXT NOT NULL, " + // ⭐ Use Category Name instead of ID
                     COL_TRANS_AMOUNT + " REAL NOT NULL, " +
                     COL_TRANS_DESC + " TEXT, " +
                     COL_TRANS_DATE + " TEXT NOT NULL, " +
@@ -92,7 +92,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_BUDGET + " (" +
                     COL_BUDGET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COL_USER_ID + " INTEGER NOT NULL, " +
-                    COL_BUDGET_CAT_NAME + " TEXT NOT NULL, " + // ⭐ Dùng tên Category thay cho ID
+                    COL_BUDGET_CAT_NAME + " TEXT NOT NULL, " + // ⭐ Use Category Name instead of ID
                     COL_BUDGET_MAX + " REAL NOT NULL, " +
                     COL_MONTH + " INTEGER, " +
                     COL_YEAR + " INTEGER, " +
@@ -103,7 +103,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_RECURRING + " (" +
                     COL_RECUR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COL_USER_ID + " INTEGER NOT NULL, " +
-                    COL_RECUR_CAT_NAME + " TEXT NOT NULL, " + // ⭐ Dùng tên Category thay cho ID
+                    COL_RECUR_CAT_NAME + " TEXT NOT NULL, " + // ⭐ Use Category Name instead of ID
                     COL_RECUR_AMOUNT + " REAL NOT NULL, " +
                     COL_FREQUENCY + " TEXT, " +
                     COL_START_DATE + " TEXT NOT NULL, " +
@@ -124,7 +124,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     ")";
 
     // ----------------------------------------------------------------------
-    // 3. ONCREATE VÀ ONUPGRADE
+    // 3. ONCREATE AND ONUPGRADE
     // ----------------------------------------------------------------------
 
     public DatabaseHelper(Context context) {
@@ -138,12 +138,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_BUDGET);
         db.execSQL(CREATE_TABLE_RECURRING);
         db.execSQL(CREATE_TABLE_NOTIFICATION);
-        Log.d("DB_CREATE", "Đã tạo 5 bảng thành công.");
+        Log.d("DB_CREATE", "Successfully created 5 tables.");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // ⭐ XÓA BẢNG CATEGORY VÀ TẤT CẢ CÁC BẢNG KHÁC ⭐
+        // ⭐ DROP CATEGORY TABLE AND ALL OTHER TABLES ⭐
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTIFICATION);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_RECURRING);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_BUDGET);
@@ -151,14 +151,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
 
         onCreate(db);
-        Log.d("DB_UPGRADE", "Đã nâng cấp CSDL lên V" + newVersion + ". Bảng Category đã bị loại bỏ.");
+        Log.d("DB_UPGRADE", "Upgraded DB to V" + newVersion + ". Category table has been removed.");
     }
 
     // ----------------------------------------------------------------------
-    // 4. CÁC PHƯƠNG THỨC CRUD (ĐÃ SỬA DÙNG ĐÚNG HẰNG SỐ VÀ KHÔNG CẦN CATEGORY ID)
+    // 4. CRUD METHODS (FIXED TO USE CORRECT CONSTANTS AND NO CATEGORY ID)
     // ----------------------------------------------------------------------
 
-    // Cập nhật mật khẩu
+    // Update password
     public boolean updatePassword(String email, String newPassword) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -173,7 +173,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rowsAffected > 0;
     }
 
-    // Thêm người dùng mới
+    // Add new user
     public long addUser(String name, String email, String password, String codePass) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -191,7 +191,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    // Lưu mã xác thực
+    // Save verification code
     public boolean setVerifyCode(String email, String code) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -206,7 +206,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rowsAffected > 0;
     }
 
-    // Xóa mã xác thực
+    // Clear verification code
     public boolean clearVerifyCode(String email) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -220,7 +220,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return rowsAffected > 0;
     }
 
-    // Kiểm tra Email tồn tại
+    // Check if Email exists
     public boolean checkUserExists(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
@@ -240,23 +240,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String[] selectionArgs = {email, password};
         Cursor cursor = null;
-        int userId = -1; // Mặc định là thất bại
+        int userId = -1; // Default is failure
 
         try {
             cursor = db.query(
                     TABLE_USER,
-                    new String[]{COL_USER_ID}, // ⭐ Lấy cột User ID
+                    new String[]{COL_USER_ID}, // ⭐ Get User ID column
                     COL_EMAIL + " = ? AND " + COL_PASSWORD + " = ?",
                     selectionArgs,
                     null, null, null
             );
 
             if (cursor.moveToFirst()) {
-                // Lấy userId từ cột đầu tiên
+                // Get userId from the first column
                 userId = cursor.getInt(cursor.getColumnIndexOrThrow(COL_USER_ID));
             }
         } catch (Exception e) {
-            Log.e("DB_AUTH", "Lỗi kiểm tra đăng nhập: " + e.getMessage());
+            Log.e("DB_AUTH", "Login check error: " + e.getMessage());
         } finally {
             if (cursor != null) cursor.close();
             db.close();
@@ -264,7 +264,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return userId;
     }
 
-    // Lấy mã xác thực
+    // Get verification code
     public String getVerifyCode(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
         String code = null;
@@ -289,25 +289,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Lấy danh sách giao dịch của User trong một tháng cụ thể.
-     * @param month Tháng (1-12)
-     * @param year Năm (yyyy)
+     * Get list of transactions for User in a specific month.
+     * @param month Month (1-12)
+     * @param year Year (yyyy)
      */
     public List<Transaction> getTransactionsByMonth(int userId, int month, int year) {
         List<Transaction> transactionList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Định dạng tháng thành "01", "02"... để so sánh chuỗi
+        // Format month to "01", "02"... for string comparison
         String monthStr = String.format("%02d", month);
         String yearStr = String.valueOf(year);
 
-        // Truy vấn: Lấy tất cả giao dịch của User, lọc theo Tháng và Năm từ chuỗi Date (YYYY-MM-DD)
-        // Sử dụng strftime để trích xuất tháng và năm từ cột date
+        // Query: Get all transactions of User, filter by Month and Year from Date string (YYYY-MM-DD)
+        // Use strftime to extract month and year from date column
         String query = "SELECT * FROM " + TABLE_TRANSACTION +
                 " WHERE " + COL_USER_ID + " = ? " +
                 " AND strftime('%m', " + COL_TRANS_DATE + ") = ? " +
                 " AND strftime('%Y', " + COL_TRANS_DATE + ") = ? " +
-                " ORDER BY " + COL_TRANS_DATE + " DESC"; // Sắp xếp mới nhất lên đầu
+                " ORDER BY " + COL_TRANS_DATE + " DESC"; // Sort newest first
 
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), monthStr, yearStr});
 
@@ -320,23 +320,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String date = cursor.getString(cursor.getColumnIndexOrThrow(COL_TRANS_DATE));
                 String type = cursor.getString(cursor.getColumnIndexOrThrow(COL_TRANS_TYPE));
 
-                // Thêm vào danh sách
+                // Add to list
                 transactionList.add(new Transaction(id, amount, category, desc, date, type));
             } while (cursor.moveToNext());
         }
 
         cursor.close();
-        // db.close(); // Giữ mở nếu cần dùng lại ngay
+        // db.close(); // Keep open if needed immediately
         return transactionList;
     }
 
     /**
-     * Tính tổng thu/chi trong tháng (Trả về mảng double: [0]=Income, [1]=Expense)
+     * Calculate total income/expense in month (Returns double array: [0]=Income, [1]=Expense)
      */
     public double[] getMonthlyTotals(int userId, int month, int year) {
         double income = 0;
         double expense = 0;
-        List<Transaction> transactions = getTransactionsByMonth(userId, month, year); // Tái sử dụng hàm trên
+        List<Transaction> transactions = getTransactionsByMonth(userId, month, year); // Reuse the function above
 
         for (Transaction t : transactions) {
             if ("income".equalsIgnoreCase(t.getType())) {
@@ -348,7 +348,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return new double[]{income, expense};
     }
 
-    // 1. Hàm Xóa Giao Dịch
+    // 1. Delete Transaction Function
     public boolean deleteTransaction(int transactionId) {
         SQLiteDatabase db = this.getWritableDatabase();
         // DELETE FROM TransactionTable WHERE transactionId = ?
@@ -357,7 +357,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result > 0;
     }
 
-    // 2. Hàm Cập Nhật Giao Dịch
+    // 2. Update Transaction Function
     public boolean updateTransaction(int transactionId, int userId, double amount, String category, String note, String date, String type) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -376,8 +376,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Lấy danh sách tổng hợp số tiền theo từng danh mục (để vẽ biểu đồ).
-     * @param type "income" hoặc "expense"
+     * Get aggregated total amount by category (for drawing charts).
+     * @param type "income" or "expense"
      */
     public Cursor getCategoryReport(int userId, int month, int year, String type) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -397,7 +397,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Lấy danh sách giao dịch lọc theo Type (Income/Expense) để hiển thị list.
+     * Get list of transactions filtered by Type (Income/Expense) for list display.
      */
     public List<Transaction> getTransactionsByType(int userId, int month, int year, String type) {
         List<Transaction> transactionList = new ArrayList<>();
@@ -407,7 +407,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         String query = "SELECT * FROM " + TABLE_TRANSACTION +
                 " WHERE " + COL_USER_ID + " = ? " +
-                " AND " + COL_TRANS_TYPE + " = ? " + // Thêm điều kiện lọc Type
+                " AND " + COL_TRANS_TYPE + " = ? " + // Add Type filter condition
                 " AND strftime('%m', " + COL_TRANS_DATE + ") = ? " +
                 " AND strftime('%Y', " + COL_TRANS_DATE + ") = ? " +
                 " ORDER BY " + COL_TRANS_DATE + " DESC";
@@ -416,7 +416,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                // ... (Copy logic đọc Transaction cũ vào đây) ...
+                // ... (Copy Transaction reading logic here) ...
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_TRANS_ID));
                 double amount = cursor.getDouble(cursor.getColumnIndexOrThrow(COL_TRANS_AMOUNT));
                 String category = cursor.getString(cursor.getColumnIndexOrThrow(COL_TRANS_CAT_NAME));
@@ -430,7 +430,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return transactionList;
     }
 
-    // 1. Hàm lưu Budget (Upsert)
+    // 1. Save Budget Function (Upsert)
     public boolean setBudget(int userId, String category, double maxAmount, int month, int year) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -440,29 +440,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(COL_MONTH, month);
         cv.put(COL_YEAR, year);
 
-        // Kiểm tra xem đã có bản ghi chưa
+        // Check if record already exists
         String whereClause = COL_USER_ID + "=? AND " + COL_BUDGET_CAT_NAME + "=? AND " + COL_MONTH + "=? AND " + COL_YEAR + "=?";
         String[] whereArgs = {String.valueOf(userId), category, String.valueOf(month), String.valueOf(year)};
 
         int rows = db.update(TABLE_BUDGET, cv, whereClause, whereArgs);
 
         if (rows == 0) {
-            // Chưa có -> Insert
+            // Not exist -> Insert
             long result = db.insert(TABLE_BUDGET, null, cv);
             db.close();
             return result != -1;
         }
 
         db.close();
-        return true; // Update thành công
+        return true; // Update successful
     }
 
-    // 2. Hàm lấy danh sách Budget của User (Mới)
+    // 2. Get User's Budget List (New)
     public List<Budget> getBudgets(int userId) {
         List<Budget> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Sắp xếp theo Năm giảm dần, sau đó đến Tháng giảm dần
+        // Sort by Year descending, then Month descending
         String query = "SELECT * FROM " + TABLE_BUDGET +
                 " WHERE " + COL_USER_ID + " = ? " +
                 " ORDER BY " + COL_YEAR + " DESC, " + COL_MONTH + " DESC";
@@ -483,7 +483,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return list;
     }
-    // Hàm xóa Budget theo ID
+    // Delete Budget by ID
     public boolean deleteBudget(int budgetId) {
         SQLiteDatabase db = this.getWritableDatabase();
         // DELETE FROM BudgetLimit WHERE budgetLimitId = ?
@@ -491,14 +491,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return result > 0;
     }
-    // ⭐ HÀM MỚI: Lấy thông tin User theo ID để hiển thị ở Setting
+    // ⭐ NEW FUNCTION: Get User info by ID to display in Settings
     public Cursor getUserById(int userId) {
         SQLiteDatabase db = this.getReadableDatabase();
         // SELECT * FROM User WHERE userId = ?
         return db.query(TABLE_USER, null, COL_USER_ID + "=?", new String[]{String.valueOf(userId)}, null, null, null);
     }
 
-    // 1. Thêm khoản định kỳ mới
+    // 1. Add new recurring expense
     public boolean addRecurring(int userId, String category, double amount, String frequency, String startDate, String endDate, String status) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -508,7 +508,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COL_FREQUENCY, frequency);
         values.put(COL_START_DATE, startDate);
         values.put(COL_END_DATE, endDate);
-        values.put(COL_STATUS, status); // Thường mặc định là "Active"
+        values.put(COL_STATUS, status); // Usually defaults to "Active"
 
         long result = db.insert(TABLE_RECURRING, null, values);
         db.close();
@@ -516,22 +516,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * 1. Lấy tất cả khoản định kỳ đang Active của TẤT CẢ USER.
-     * (Dùng cho Worker chạy ngầm để quét và trừ tiền)
+     * 1. Get all Active recurring expenses for ALL USERS.
+     * (Used for background Worker to scan and deduct money)
      */
     public List<RecurringExpense> getAllActiveRecurring() {
         List<RecurringExpense> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Query lấy tất cả các dòng có status là Active
+        // Query all rows with status Active
         String query = "SELECT * FROM " + TABLE_RECURRING + " WHERE " + COL_STATUS + " = 'Active'";
         Cursor cursor = db.rawQuery(query, null);
 
         if (cursor.moveToFirst()) {
             do {
-                // ⭐ BƯỚC QUAN TRỌNG: Phải lấy dữ liệu từ Cursor ra biến trước
+                // ⭐ IMPORTANT STEP: Must extract data from Cursor to variables first
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_RECUR_ID));
-                int userId = cursor.getInt(cursor.getColumnIndexOrThrow(COL_USER_ID)); // Lấy UserID để biết trừ của ai
+                int userId = cursor.getInt(cursor.getColumnIndexOrThrow(COL_USER_ID)); // Get UserID to know who to deduct from
                 String category = cursor.getString(cursor.getColumnIndexOrThrow(COL_RECUR_CAT_NAME));
                 double amount = cursor.getDouble(cursor.getColumnIndexOrThrow(COL_RECUR_AMOUNT));
                 String frequency = cursor.getString(cursor.getColumnIndexOrThrow(COL_FREQUENCY));
@@ -539,16 +539,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String end = cursor.getString(cursor.getColumnIndexOrThrow(COL_END_DATE));
                 String status = cursor.getString(cursor.getColumnIndexOrThrow(COL_STATUS));
 
-                // Tạo đối tượng với đầy đủ thông tin (bao gồm userId)
+                // Create object with full info (including userId)
                 list.add(new RecurringExpense(id, userId, category, amount, frequency, start, end, status));
             } while (cursor.moveToNext());
         }
         cursor.close();
-        // db.close(); // Giữ mở nếu cần
+        // db.close(); // Keep open if needed
         return list;
     }
 
-    // 3. Xóa khoản định kỳ
+    // 3. Delete recurring expense
     public boolean deleteRecurring(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         int result = db.delete(TABLE_RECURRING, COL_RECUR_ID + "=?", new String[]{String.valueOf(id)});
@@ -565,8 +565,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * 2. Lấy danh sách định kỳ của MỘT USER CỤ THỂ.
-     * (Dùng để hiển thị lên màn hình RecurringActivity)
+     * 2. Get recurring list for A SPECIFIC USER.
+     * (Used to display on RecurringActivity screen)
      */
     public List<RecurringExpense> getRecurringList(int userIdInput) {
         List<RecurringExpense> list = new ArrayList<>();
@@ -577,7 +577,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                // Lấy dữ liệu từ Cursor
+                // Get data from Cursor
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_RECUR_ID));
                 int userId = cursor.getInt(cursor.getColumnIndexOrThrow(COL_USER_ID));
                 String category = cursor.getString(cursor.getColumnIndexOrThrow(COL_RECUR_CAT_NAME));
@@ -587,7 +587,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String end = cursor.getString(cursor.getColumnIndexOrThrow(COL_END_DATE));
                 String status = cursor.getString(cursor.getColumnIndexOrThrow(COL_STATUS));
 
-                // Tạo đối tượng
+                // Create object
                 list.add(new RecurringExpense(id, userId, category, amount, frequency, start, end, status));
             } while (cursor.moveToNext());
         }
@@ -610,7 +610,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     //Notification
-    // 1. Hàm Thêm Thông Báo Mới
+    // 1. Add New Notification Function
     public void addNotification(int userId, String title, String message, String date) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -624,7 +624,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d("DB_NOTIF", "Added Notification result: " + result);
     }
 
-    // 2. Hàm Lấy Danh Sách Thông Báo
+    // 2. Get Notification List Function
     public List<NotificationItem> getUserNotifications(int userId) {
         List<NotificationItem> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -645,7 +645,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    // 3. Hàm Kiểm Tra Hạn Mức (Lấy Budget Max của 1 danh mục trong tháng)
+    // 3. Check Budget Limit Function (Get Max Budget of a category in month)
     public double getBudgetLimit(int userId, String category, int month, int year) {
         SQLiteDatabase db = this.getReadableDatabase();
         double limit = 0;
@@ -660,14 +660,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             limit = cursor.getDouble(0);
         }
         cursor.close();
-        return limit; // Trả về 0 nếu chưa cài đặt hạn mức
+        return limit; // Return 0 if limit not set
     }
 
-    // 4. Hàm tính tổng chi tiêu của 1 danh mục trong tháng (để so sánh)
+    // 4. Calculate total expense of a category in month (for comparison)
     public double getCategoryTotalExpense(int userId, String category, int month, int year) {
         SQLiteDatabase db = this.getReadableDatabase();
         String monthStr = String.format("%02d", month);
 
+        // Calculate total expense money of that category in the month
         String query = "SELECT SUM(" + COL_TRANS_AMOUNT + ") FROM " + TABLE_TRANSACTION +
                 " WHERE " + COL_USER_ID + "=? AND " + COL_TRANS_CAT_NAME + "=? AND " + COL_TRANS_TYPE + "='expense'" +
                 " AND strftime('%m', " + COL_TRANS_DATE + ") = ? " +
@@ -683,44 +684,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return total;
     }
     /**
-     * Kiểm tra hạn mức, lưu thông báo vào DB và TRẢ VỀ nội dung cảnh báo để hiển thị lên UI.
+     * Check limit, save notification to DB and RETURN warning content to display on UI.
      * @return String: Nội dung cảnh báo nếu vượt, null nếu an toàn.
      */
     public String checkAndNotifyBudgetExceeded(int userId, String category, String dateStr) {
         try {
-            // 1. Phân tích ngày (Giả định format yyyy-MM-dd từ MainActivity)
+            // 1. Parse date (Assume yyyy-MM-dd format from MainActivity)
             String[] parts = dateStr.split("-");
-            if (parts.length < 2) return null; // Tránh lỗi nếu định dạng ngày sai
+            if (parts.length < 2) return null; // Avoid error if date format is wrong
 
             int year = Integer.parseInt(parts[0]);
             int month = Integer.parseInt(parts[1]);
 
-            // 2. Lấy hạn mức (Budget)
+            // 2. Get Budget Limit
             double limit = getBudgetLimit(userId, category, month, year);
 
-            // Nếu không đặt hạn mức hoặc hạn mức = 0 thì không cần kiểm tra
+            // If budget not set or limit = 0, no check needed
             if (limit <= 0) return null;
 
-            // 3. Tính tổng chi tiêu thực tế của danh mục trong tháng này (Đã bao gồm khoản vừa thêm)
+            // 3. Calculate actual total expense of category this month (Including newly added item)
             double currentTotal = getCategoryTotalExpense(userId, category, month, year);
 
-            // 4. So sánh: Nếu Tổng chi > Hạn mức
+            // 4. Compare: If Total Expense > Limit
             if (currentTotal > limit) {
-                // Tạo nội dung thông báo chi tiết
+                // Create detailed notification content
                 String message = String.format(java.util.Locale.US,
-                        "Danh mục '%s' đã vượt hạn mức tháng %02d/%d.\n\nĐã chi: %,.0f VND\nHạn mức: %,.0f VND\nVượt quá: %,.0f VND",
+                        "Category '%s' exceeded budget for month %02d/%d.\n\nSpent: %,.0f VND\nLimit: %,.0f VND\nExceeded by: %,.0f VND",
                         category, month, year, currentTotal, limit, (currentTotal - limit));
 
-                // Lấy thời gian hiện tại để lưu vào lịch sử thông báo
+                // Get current time to save to notification history
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.US);
                 String now = sdf.format(java.util.Calendar.getInstance().getTime());
 
-                // 5. Lưu cảnh báo vào bảng Notification
-                addNotification(userId, "⚠️ Cảnh báo vượt hạn mức!", message, now);
+                // 5. Save alert to Notification table
+                addNotification(userId, "⚠️ Budget Exceeded Alert!", message, now);
 
                 Log.w("BUDGET_CHECK", "User " + userId + " exceeded budget for " + category);
 
-                // ⭐ TRẢ VỀ MESSAGE ĐỂ HIỂN THỊ LÊN MÀN HÌNH (DIALOG)
+                // ⭐ RETURN MESSAGE TO DISPLAY ON SCREEN (DIALOG)
                 return message;
             }
 
@@ -729,6 +730,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
 
-        return null; // Trả về null nếu không vượt hạn mức hoặc có lỗi
+        return null; // Return null if not exceeding limit or error
     }
 }

@@ -18,23 +18,23 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Đây sẽ là Activity chính hiển thị khi khởi động
+        // This is main activity when start app
         setContentView(R.layout.activity_login);
 
-        // Khởi tạo DatabaseHelper
+        // Initialize DatabaseHelper
         dbHelper = new DatabaseHelper(this);
 
-        // Ánh xạ Views từ Layout
+        // Initialize Views from Layout
         loginEmail = findViewById(R.id.login_email);
         loginPassword = findViewById(R.id.login_password);
         btnLogin = findViewById(R.id.btn_login);
         tvRegisterNow = findViewById(R.id.tv_register_now);
         tvForgotPass = findViewById(R.id.tvForgotPass);
 
-        // Thiết lập sự kiện cho nút ĐĂNG NHẬP
+        // Establish button Login event
         btnLogin.setOnClickListener(v -> handleLogin());
 
-        // Thiết lập sự kiện chuyển sang màn hình Đăng ký
+        // Establish event navigate to Register Activity
         tvRegisterNow.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
@@ -50,25 +50,25 @@ public class LoginActivity extends AppCompatActivity {
         String email = loginEmail.getText().toString().trim();
         String pass = loginPassword.getText().toString().trim();
 
-        // 1. Kiểm tra đầu vào
+        // 1. Check input
         if (email.isEmpty() || pass.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập Email và Mật khẩu!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please enter email and password!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 2. Kiểm tra thông tin đăng nhập với CSDL
+        // 2. Check credentials with DatabaseHelper
         int userId = dbHelper.checkCredentials(email, pass);
 
-        if (userId != -1) { // Đăng nhập thành công
-            Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_LONG).show();
+        if (userId != -1) { // Login successfully
+            Toast.makeText(this, "Login successfully!", Toast.LENGTH_LONG).show();
 
-            // ⭐ BƯỚC 2: Tạo Intent và đính kèm userId
+            // ⭐ Create Intent và attached userId
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            intent.putExtra("EXTRA_USER_ID", userId); // Đính kèm userId
+            intent.putExtra("EXTRA_USER_ID", userId); // attached userId
             startActivity(intent);
             finish();
         } else {
-            Toast.makeText(this, "Email hoặc Mật khẩu không đúng.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Email or Password is incorrect.", Toast.LENGTH_SHORT).show();
         }
     }
 }

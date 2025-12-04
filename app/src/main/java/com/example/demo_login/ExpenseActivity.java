@@ -18,7 +18,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-// ⭐ Implements Interface từ Adapter
+// ⭐ Implements Interface from Adapter
 public class ExpenseActivity extends AppCompatActivity implements TransactionAdapter.OnTransactionItemListener {
 
     private TextView tvSelectedMonth, tvTotalIncome, tvTotalExpense, tvBalance;
@@ -35,11 +35,9 @@ public class ExpenseActivity extends AppCompatActivity implements TransactionAda
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expense);
 
-        // 1. Khởi tạo
         currentCalendar = Calendar.getInstance();
         dbHelper = new DatabaseHelper(this);
 
-        // 2. Ánh xạ Views
         btnPrevMonth = findViewById(R.id.btn_prev_month);
         btnNextMonth = findViewById(R.id.btn_next_month);
         btnOpenCalendar = findViewById(R.id.btn_open_calendar);
@@ -49,27 +47,20 @@ public class ExpenseActivity extends AppCompatActivity implements TransactionAda
         tvBalance = findViewById(R.id.tv_balance);
         recyclerView = findViewById(R.id.recycler_transactions);
 
-        // 3. Nhận User ID
         if (getIntent().hasExtra("EXTRA_USER_ID")) {
             currentUserId = getIntent().getIntExtra("EXTRA_USER_ID", -1);
         }
 
-        // 4. Cấu hình RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // 5. Thiết lập Footer
         FooterActivity.setupFooterListeners(this, currentUserId);
 
-        // 6. Hiển thị dữ liệu
         updateMonthDisplay();
 
-        // 7. Sự kiện Click
         btnPrevMonth.setOnClickListener(v -> navigateMonth(-1));
         btnNextMonth.setOnClickListener(v -> navigateMonth(1));
         btnOpenCalendar.setOnClickListener(v -> showMonthPicker());
     }
-
-    // --- CÁC HÀM LOGIC ---
 
     private void updateMonthDisplay() {
         SimpleDateFormat sdf = new SimpleDateFormat("MMM yyyy", Locale.US);
@@ -84,7 +75,6 @@ public class ExpenseActivity extends AppCompatActivity implements TransactionAda
         List<Transaction> list = dbHelper.getTransactionsByMonth(currentUserId, month, year);
 
         if (adapter == null) {
-            // ⭐ Truyền 'this' làm listener
             adapter = new TransactionAdapter(this, list, this);
             recyclerView.setAdapter(adapter);
         } else {
@@ -124,8 +114,6 @@ public class ExpenseActivity extends AppCompatActivity implements TransactionAda
         datePickerDialog.show();
     }
 
-    // --- TRIỂN KHAI INTERFACE ---
-
     @Override
     public void onDeleteClick(int transactionId, int position) {
         new AlertDialog.Builder(this)
@@ -148,8 +136,6 @@ public class ExpenseActivity extends AppCompatActivity implements TransactionAda
     public void onEditClick(Transaction transaction) {
         Intent intent = new Intent(ExpenseActivity.this, MainActivity.class);
         intent.putExtra("EXTRA_USER_ID", currentUserId);
-
-        // Gửi dữ liệu sang Main để Edit
         intent.putExtra("EDIT_MODE", true);
         intent.putExtra("TRANS_ID", transaction.getId());
         intent.putExtra("TRANS_AMOUNT", transaction.getAmount());

@@ -21,15 +21,13 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     private Context context;
     private List<Transaction> transactionList;
 
-    // ⭐ 1. Khai báo Interface Listener
     private OnTransactionItemListener listener;
 
     public interface OnTransactionItemListener {
-        void onEditClick(Transaction transaction);   // Trả về object transaction để sửa
-        void onDeleteClick(int transactionId, int position); // Trả về ID để xóa
+        void onEditClick(Transaction transaction);
+        void onDeleteClick(int transactionId, int position);
     }
 
-    // ⭐ 2. Cập nhật Constructor để nhận Listener
     public TransactionAdapter(Context context, List<Transaction> transactionList, OnTransactionItemListener listener) {
         this.context = context;
         this.transactionList = transactionList;
@@ -52,7 +50,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Transaction transaction = transactionList.get(position);
 
-        // ... (Code bind dữ liệu cũ giữ nguyên: Name, Note, Date, Amount) ...
         holder.tvCategory.setText(transaction.getCategoryName());
         holder.tvNote.setText(transaction.getDescription());
         holder.tvDate.setText(transaction.getDate());
@@ -68,7 +65,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             holder.tvAmount.setTextColor(Color.parseColor("#F44336"));
         }
 
-        // ⭐ 3. Gán sự kiện Click cho nút Edit và Delete
         holder.btnEdit.setOnClickListener(v -> {
             if (listener != null) listener.onEditClick(transaction);
         });
@@ -86,7 +82,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvCategory, tvNote, tvAmount, tvDate;
         ImageView imgIcon;
-        ImageButton btnEdit, btnDelete; // ⭐ Khai báo nút mới
+        ImageButton btnEdit, btnDelete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -96,7 +92,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             tvDate = itemView.findViewById(R.id.tv_trans_date);
             imgIcon = itemView.findViewById(R.id.img_category_icon);
 
-            // ⭐ Ánh xạ nút mới
             btnEdit = itemView.findViewById(R.id.btn_edit_item);
             btnDelete = itemView.findViewById(R.id.btn_delete_item);
         }

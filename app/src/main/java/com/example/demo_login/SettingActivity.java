@@ -26,29 +26,23 @@ public class SettingActivity extends AppCompatActivity {
 
         dbHelper = new DatabaseHelper(this);
 
-        // 1. Nhận User ID
         if (getIntent().hasExtra("EXTRA_USER_ID")) {
             currentUserId = getIntent().getIntExtra("EXTRA_USER_ID", -1);
         }
         if (currentUserId == -1) {
-            // Nếu không có ID, quay về Login
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;
         }
 
-        // 2. Ánh xạ Views
         tvName = findViewById(R.id.tvSettingName);
         tvEmail = findViewById(R.id.tvSettingEmail);
         tvPassword = findViewById(R.id.tvSettingPassword);
         btnBudget = findViewById(R.id.btnGoToBudget);
         btnRecurring = findViewById(R.id.btnGoToRecurring);
         btnLogout = findViewById(R.id.btnLogout);
-
-        // 3. Load thông tin User
         loadUserProfile();
 
-        // 4. Sự kiện chuyển trang
         btnBudget.setOnClickListener(v -> {
             Intent intent = new Intent(SettingActivity.this, BudgetActivity.class);
             intent.putExtra("EXTRA_USER_ID", currentUserId);
@@ -56,39 +50,34 @@ public class SettingActivity extends AppCompatActivity {
         });
 
         btnRecurring.setOnClickListener(v -> {
-            // Giả định bạn đã có RecurringActivity
             Intent intent = new Intent(SettingActivity.this, RecurringActivity.class);
             intent.putExtra("EXTRA_USER_ID", currentUserId);
             startActivity(intent);
         });
 
         btnLogout.setOnClickListener(v -> {
-            // Đăng xuất: Quay về Login và xóa stack activity
             Intent intent = new Intent(SettingActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
         });
 
-        // 5. Thiết lập Footer (để chuyển qua lại các tab chính)
         FooterActivity.setupFooterListeners(this, currentUserId);
     }
 
     private void loadUserProfile() {
         Cursor cursor = dbHelper.getUserById(currentUserId);
         if (cursor != null && cursor.moveToFirst()) {
-            // Lấy dữ liệu từ Cursor
             String name = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_USERNAME));
             String email = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_EMAIL));
 
-            // Hiển thị lên UI
             tvName.setText(name);
             tvEmail.setText(email);
             tvPassword.setText("********");
 
             cursor.close();
         } else {
-            Toast.makeText(this, "Không thể tải thông tin người dùng", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Can not load user profile", Toast.LENGTH_SHORT).show();
         }
     }
 }

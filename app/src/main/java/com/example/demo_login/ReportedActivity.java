@@ -32,10 +32,10 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
 
     // Views
     private TextView tvSelectedMonth, tvTotalIncome, tvTotalExpense, tvBalance;
-    private TextView tvFilterExpense, tvFilterIncome; // Nút lọc
+    private TextView tvFilterExpense, tvFilterIncome;
     private ImageButton btnPrevMonth, btnNextMonth, btnOpenCalendar;
     private RecyclerView recyclerView;
-    private PieChart pieChart; // Biểu đồ
+    private PieChart pieChart;
 
     // Logic
     private DatabaseHelper dbHelper;
@@ -43,7 +43,6 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
     private Calendar currentCalendar;
     private TransactionAdapter adapter;
 
-    // Trạng thái lọc hiện tại ("expense" hoặc "income")
     private String currentFilterType = "expense";
 
     @Override
@@ -51,11 +50,9 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reported);
 
-        // Khởi tạo
         currentCalendar = Calendar.getInstance();
         dbHelper = new DatabaseHelper(this);
 
-        // Ánh xạ Views (CŨ + MỚI)
         tvSelectedMonth = findViewById(R.id.tv_selected_month);
         btnPrevMonth = findViewById(R.id.btn_prev_month);
         btnNextMonth = findViewById(R.id.btn_next_month);
@@ -70,38 +67,29 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
         tvFilterIncome = findViewById(R.id.tv_filter_income);
         pieChart = findViewById(R.id.pieChart);
 
-        // Nhận User ID
         if (getIntent().hasExtra("EXTRA_USER_ID")) {
             currentUserId = getIntent().getIntExtra("EXTRA_USER_ID", -1);
         }
 
-        // Cấu hình RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Thiết lập Footer
         FooterActivity.setupFooterListeners(this, currentUserId);
 
-        // Sự kiện Lọc Income/Expense
         tvFilterExpense.setOnClickListener(v -> setFilter("expense"));
         tvFilterIncome.setOnClickListener(v -> setFilter("income"));
 
-        // Sự kiện Calendar
         btnPrevMonth.setOnClickListener(v -> navigateMonth(-1));
         btnNextMonth.setOnClickListener(v -> navigateMonth(1));
         btnOpenCalendar.setOnClickListener(v -> showMonthPicker());
 
-        // Load dữ liệu lần đầu
         updateMonthDisplay();
 
-        // Đặt màu mặc định cho nút filter ban đầu (expense)
         setFilter("expense");
     }
 
-    // --- LOGIC CHUYỂN ĐỔI BỘ LỌC ---
     private void setFilter(String type) {
         currentFilterType = type;
 
-        // Cập nhật UI nút bấm (Thay đổi màu nền/chữ để biết đang chọn cái nào)
         if ("expense".equals(type)) {
             // Expense Active
             tvFilterExpense.setBackgroundResource(R.drawable.tab_selected_bg);
@@ -118,7 +106,6 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
             tvFilterExpense.setTextColor(Color.BLACK);
         }
 
-        // Tải lại dữ liệu (Biểu đồ + List) theo bộ lọc mới
         loadDataForMonth();
     }
 
@@ -126,10 +113,8 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
         int month = currentCalendar.get(Calendar.MONTH) + 1;
         int year = currentCalendar.get(Calendar.YEAR);
 
-        // 1. Cập nhật Dashboard (Tổng quan) - Không phụ thuộc bộ lọc
         updateDashboard(month, year);
 
-        // 2. Cập nhật Danh sách Giao dịch (Theo bộ lọc hiện tại)
         List<Transaction> list = dbHelper.getTransactionsByType(currentUserId, month, year, currentFilterType);
 
         if (adapter == null) {
@@ -139,11 +124,9 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
             adapter.updateData(list);
         }
 
-        // 3. Vẽ Biểu đồ Tròn (Theo bộ lọc hiện tại)
         drawPieChart(month, year, currentFilterType);
     }
 
-    // ⭐ HÀM CẬP NHẬT DASHBOARD (Đã bổ sung) ⭐
     private void updateDashboard(int month, int year) {
         double[] totals = dbHelper.getMonthlyTotals(currentUserId, month, year);
         double income = totals[0];
@@ -156,15 +139,12 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
         tvBalance.setText(fmt.format(balance));
     }
 
-    // --- HÀM VẼ BIỂU ĐỒ ---
     private void drawPieChart(int month, int year, String type) {
         ArrayList<PieEntry> entries = new ArrayList<>();
-        // Gọi hàm lấy báo cáo theo category từ DB
         Cursor cursor = dbHelper.getCategoryReport(currentUserId, month, year, type);
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                // Cột 0 là tên Category, Cột 1 là Tổng tiền (SUM)
                 String category = cursor.getString(0);
                 float amount = cursor.getFloat(1);
                 entries.add(new PieEntry(amount, category));
@@ -173,14 +153,14 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
         }
 
         if (entries.isEmpty()) {
-            pieChart.clear(); // Xóa biểu đồ nếu không có dữ liệu
-            pieChart.setNoDataText("Chưa có dữ liệu " + type + " trong tháng này.");
+            pieChart.clear();
+            pieChart.setNoDataText("None data" + type + " on this month.");
             pieChart.invalidate();
             return;
         }
 
         PieDataSet dataSet = new PieDataSet(entries, type.toUpperCase());
-        dataSet.setColors(ColorTemplate.MATERIAL_COLORS); // Bộ màu mặc định
+        dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
         dataSet.setValueTextSize(12f);
         dataSet.setValueTextColor(Color.WHITE);
 
@@ -190,21 +170,18 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
         pieChart.setCenterText(type.toUpperCase());
         pieChart.setEntryLabelColor(Color.BLACK);
         pieChart.animateY(1000);
-        pieChart.invalidate(); // Refresh biểu đồ
+        pieChart.invalidate();
     }
-
-    // --- CÁC HÀM LOGIC NGÀY THÁNG ---
 
     private void updateMonthDisplay() {
         SimpleDateFormat sdf = new SimpleDateFormat("MMM yyyy", Locale.US);
         tvSelectedMonth.setText(sdf.format(currentCalendar.getTime()));
-        // Không gọi loadDataForMonth() ở đây nữa vì setFilter() trong onCreate đã gọi rồi
     }
 
     private void navigateMonth(int months) {
         currentCalendar.add(Calendar.MONTH, months);
         updateMonthDisplay();
-        loadDataForMonth(); // Gọi load data khi đổi tháng
+        loadDataForMonth();
     }
 
     private void showMonthPicker() {
@@ -216,7 +193,7 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
                     currentCalendar.set(Calendar.DAY_OF_MONTH, 1);
 
                     updateMonthDisplay();
-                    loadDataForMonth(); // Gọi load data khi chọn xong
+                    loadDataForMonth();
                 },
                 currentCalendar.get(Calendar.YEAR),
                 currentCalendar.get(Calendar.MONTH),
@@ -224,8 +201,6 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
         );
         datePickerDialog.show();
     }
-
-    // --- TRIỂN KHAI INTERFACE ADAPTER (DELETE/EDIT) ---
 
     @Override
     public void onDeleteClick(int transactionId, int position) {

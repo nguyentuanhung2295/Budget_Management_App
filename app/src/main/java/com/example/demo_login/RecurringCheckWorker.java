@@ -26,17 +26,17 @@ public class RecurringCheckWorker extends Worker {
     }
 
     private void checkAndProcessRecurringExpenses() {
-        // Lấy tất cả các khoản định kỳ đang Active
+        // Get all Active recurring expenses
         List<RecurringExpense> list = dbHelper.getAllActiveRecurring();
 
-        // 1. Định dạng cho Logic so sánh (Chỉ ngày)
+        // 1. Format for comparison logic (Date only)
         SimpleDateFormat sdfDateOnly = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
-        // 2. Định dạng cho Hiển thị Thông báo (Ngày + Giờ)
+        // 2. Format for Notification Display (Date + Time)
         SimpleDateFormat sdfFullTime = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
 
         Calendar today = Calendar.getInstance();
-        // Reset giờ phút giây để so sánh ngày chính xác
+        // Reset hour, minute, second for precise date comparison
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.SECOND, 0);
@@ -47,10 +47,10 @@ public class RecurringCheckWorker extends Worker {
                 Calendar scheduledDate = Calendar.getInstance();
                 scheduledDate.setTime(sdfDateOnly.parse(item.getStartDate()));
 
-                // Nếu (Ngày hẹn <= Hôm nay) -> ĐÃ ĐẾN HẠN THANH TOÁN
+                // If (Scheduled Date <= Today) -> PAYMENT DUE
                 if (!scheduledDate.after(today)) {
 
-                    // 1. Lưu Giao Dịch
+                    // 1. Save Transaction
                     dbHelper.addTransaction(
                             item.getUserId(),
                             item.getAmount(),
@@ -60,30 +60,30 @@ public class RecurringCheckWorker extends Worker {
                             "expense"
                     );
 
-                    // 2. Kiểm tra hạn mức (Budget Check)
+                    // 2. Budget Check
                     dbHelper.checkAndNotifyBudgetExceeded(
                             item.getUserId(),
                             item.getCategory(),
                             sdfDateOnly.format(today.getTime())
                     );
 
-                    // ⭐ SỬA LỖI: Khai báo nội dung thông báo trước khi dùng ⭐
-                    String notifTitle = "💸 Thanh toán định kỳ";
-                    String notifMsg = "Đã tự động trừ " + String.format(Locale.US, "%,.0f", item.getAmount()) +
-                            " cho khoản " + item.getCategory();
+                    // ⭐ FIX: Declare notification content before use ⭐
+                    String notifTitle = "💸 Recurring Payment";
+                    String notifMsg = "Auto-deducted " + String.format(Locale.US, "%,.0f", item.getAmount()) +
+                            " for category " + item.getCategory();
 
-                    // 3. Lấy thời gian thực tế để ghi log
+                    // 3. Get real-time for logging
                     String currentTimeStr = sdfFullTime.format(Calendar.getInstance().getTime());
 
-                    // 4. Lưu thông báo
+                    // 4. Save notification
                     dbHelper.addNotification(
                             item.getUserId(),
-                            notifTitle, // Biến này giờ đã được khai báo
-                            notifMsg,   // Biến này giờ đã được khai báo
+                            notifTitle, // This variable is now declared
+                            notifMsg,   // This variable is now declared
                             currentTimeStr
                     );
 
-                    // 5. Tính toán ngày tiếp theo (Next Due Date)
+                    // 5. Calculate next due date
                     if (item.getFrequency().equalsIgnoreCase("Daily")) {
                         scheduledDate.add(Calendar.DAY_OF_YEAR, 1);
                     } else if (item.getFrequency().equalsIgnoreCase("Weekly")) {
@@ -94,7 +94,7 @@ public class RecurringCheckWorker extends Worker {
                         scheduledDate.add(Calendar.YEAR, 1);
                     }
 
-                    // 6. Cập nhật ngày mới vào Database
+                    // 6. Update new date to Database
                     String nextDateStr = sdfDateOnly.format(scheduledDate.getTime());
                     dbHelper.updateRecurringStartDate(item.getId(), nextDateStr);
                 }

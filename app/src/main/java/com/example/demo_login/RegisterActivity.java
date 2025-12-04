@@ -15,16 +15,15 @@ public class RegisterActivity extends AppCompatActivity {
     private DatabaseHelper dbHelper;
     private TextView tv_back_to_login;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // Khởi tạo DatabaseHelper
+        // Initialize DatabaseHelper
         dbHelper = new DatabaseHelper(this);
 
-        // Ánh xạ Views từ Layout
+        // Map Views from Layout
         regName = findViewById(R.id.reg_name);
         regEmail = findViewById(R.id.reg_email);
         regPassword = findViewById(R.id.reg_password);
@@ -33,14 +32,14 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btn_register);
         TextView tv_back_to_login = findViewById(R.id.tv_back_to_login);
 
-        // Thiết lập sự kiện cho nút ĐĂNG KÝ
+        // Set up click listener for REGISTER button
         btnRegister.setOnClickListener(v -> handleRegistration());
 
-        // Thiết lập sự kiện quay lại màn hình Đăng nhập
+        // Set up click listener to return to Login screen
         tv_back_to_login.setOnClickListener(v -> {
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             startActivity(intent);
-            finish(); // Đóng Activity hiện tại
+            finish(); // Close current Activity
         });
     }
 
@@ -51,46 +50,45 @@ public class RegisterActivity extends AppCompatActivity {
         String verifyPass = regVerifyPassword.getText().toString().trim();
         String codePass = edtPassCode.getText().toString().trim();
 
-
-        // 1. Kiểm tra đầu vào
+        // 1. Check for empty inputs
         if (name.isEmpty() || email.isEmpty() || pass.isEmpty() || verifyPass.isEmpty() || codePass.isEmpty()) {
-            Toast.makeText(this, "Vui lòng điền đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please fill in all fields!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 2. Kiểm tra xác nhận mật khẩu
+        // 2. Check if passwords match
         if (!pass.equals(verifyPass)) {
-            Toast.makeText(this, "Mật khẩu và xác nhận mật khẩu không khớp!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Password and confirm password do not match!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 3. Kiểm tra Email đã tồn tại trong CSDL chưa
+        // 3. Check if Email already exists in DB
         if (dbHelper.checkUserExists(email)) {
-            Toast.makeText(this, "Email đã tồn tại. Vui lòng đăng nhập!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Email already exists. Please login!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 4. Check code pass to correctly just integer
+        // 4. Check if recovery code is a valid integer
         try {
-            // Cố gắng chuyển đổi chuỗi sang số nguyên
+            // Try to parse string to integer
             int code = Integer.parseInt(codePass);
         } catch (NumberFormatException e) {
-            // Nếu lỗi (không phải số), hiển thị thông báo
-            Toast.makeText(this, "Mã xác thực phải là số nguyên", Toast.LENGTH_SHORT).show();
+            // If error (not a number), show message
+            Toast.makeText(this, "Recovery code must be an integer!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 5. Thêm người dùng vào CSDL
+        // 5. Add user to DB
         long result = dbHelper.addUser(name, email, pass, codePass);
 
         if (result > 0) {
-            Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_LONG).show();
-            // Chuyển về màn hình Đăng nhập sau khi đăng ký thành công
+            Toast.makeText(this, "Registration successful!", Toast.LENGTH_LONG).show();
+            // Navigate to Login screen after successful registration
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
         } else {
-            Toast.makeText(this, "Đăng ký thất bại. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Registration failed. Please try again.", Toast.LENGTH_SHORT).show();
         }
     }
 }

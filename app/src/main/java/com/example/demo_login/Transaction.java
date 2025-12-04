@@ -6,7 +6,7 @@ public class Transaction {
     private String categoryName;
     private String description; // Note
     private String date;
-    private String type; // "income" hoặc "expense"
+    private String type; // "income" or "expense"
 
     // Constructor
     public Transaction(int id, double amount, String categoryName, String description, String date, String type) {
@@ -21,7 +21,6 @@ public class Transaction {
         return id;
     }
 
-    // Getters (Cần thiết để Adapter lấy dữ liệu)
     public double getAmount() { return amount; }
     public String getCategoryName() { return categoryName; }
     public String getDescription() { return description; }

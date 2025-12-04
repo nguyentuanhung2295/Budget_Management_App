@@ -11,7 +11,7 @@ public class NotificationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_notification); // Tạo layout này chỉ chứa 1 RecyclerView
+        setContentView(R.layout.activity_notification);
 
         int userId = getIntent().getIntExtra("EXTRA_USER_ID", -1);
         if (userId == -1) { finish(); return; }

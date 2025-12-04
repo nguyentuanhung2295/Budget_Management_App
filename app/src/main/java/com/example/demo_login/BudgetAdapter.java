@@ -18,9 +18,8 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.ViewHolder
 
     private Context context;
     private List<Budget> list;
-    private DatabaseHelper dbHelper; // ⭐ Thêm biến này
+    private DatabaseHelper dbHelper;
 
-    // ⭐ Cập nhật Constructor
     public BudgetAdapter(Context context, List<Budget> list, DatabaseHelper dbHelper) {
         this.context = context;
         this.list = list;
@@ -44,28 +43,26 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.ViewHolder
         Budget budget = list.get(position);
 
         holder.tvCategory.setText(budget.getCategory());
-        holder.tvDate.setText("Thời gian: " + budget.getMonth() + "/" + budget.getYear());
+        holder.tvDate.setText("Time: " + budget.getMonth() + "/" + budget.getYear());
 
         NumberFormat fmt = NumberFormat.getInstance(Locale.US);
         holder.tvAmount.setText(fmt.format(budget.getMaxAmount()) + " VND");
 
-        // ⭐ XỬ LÝ SỰ KIỆN XÓA ⭐
         holder.btnDelete.setOnClickListener(v -> {
             new AlertDialog.Builder(context)
-                    .setTitle("Xóa hạn mức?")
-                    .setMessage("Bạn có chắc muốn xóa hạn mức cho " + budget.getCategory() + "?")
-                    .setPositiveButton("Xóa", (dialog, which) -> {
-                        // Gọi DB để xóa
+                    .setTitle("Delete Budget?")
+                    .setMessage("Are you sure to delete for " + budget.getCategory() + "?")
+                    .setPositiveButton("Delete", (dialog, which) -> {
                         if (dbHelper.deleteBudget(budget.getId())) {
-                            list.remove(position); // Xóa khỏi danh sách hiện tại
-                            notifyItemRemoved(position); // Cập nhật UI hiệu ứng xóa
-                            notifyItemRangeChanged(position, list.size()); // Cập nhật lại vị trí
-                            Toast.makeText(context, "Đã xóa!", Toast.LENGTH_SHORT).show();
+                            list.remove(position);
+                            notifyItemRemoved(position);
+                            notifyItemRangeChanged(position, list.size());
+                            Toast.makeText(context, "Deleted!", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(this.context, "Lỗi khi xóa!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this.context, "Error deleting!", Toast.LENGTH_SHORT).show();
                         }
                     })
-                    .setNegativeButton("Hủy", null)
+                    .setNegativeButton("Cancel", null)
                     .show();
         });
     }
@@ -77,14 +74,14 @@ public class BudgetAdapter extends RecyclerView.Adapter<BudgetAdapter.ViewHolder
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvCategory, tvDate, tvAmount;
-        ImageButton btnDelete; // ⭐ Thêm nút xóa
+        ImageButton btnDelete; //
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvCategory = itemView.findViewById(R.id.tvItemCategory);
             tvDate = itemView.findViewById(R.id.tvItemDate);
             tvAmount = itemView.findViewById(R.id.tvItemAmount);
-            btnDelete = itemView.findViewById(R.id.btnDeleteItem); // ⭐ Ánh xạ
+            btnDelete = itemView.findViewById(R.id.btnDeleteItem);
         }
     }
 }
