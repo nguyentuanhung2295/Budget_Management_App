@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -142,7 +141,6 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
     private void drawPieChart(int month, int year, String type) {
         ArrayList<PieEntry> entries = new ArrayList<>();
         Cursor cursor = dbHelper.getCategoryReport(currentUserId, month, year, type);
-
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 String category = cursor.getString(0);
@@ -151,19 +149,16 @@ public class ReportedActivity extends AppCompatActivity implements TransactionAd
             } while (cursor.moveToNext());
             cursor.close();
         }
-
         if (entries.isEmpty()) {
             pieChart.clear();
             pieChart.setNoDataText("None data" + type + " on this month.");
             pieChart.invalidate();
             return;
         }
-
         PieDataSet dataSet = new PieDataSet(entries, type.toUpperCase());
         dataSet.setColors(ColorTemplate.MATERIAL_COLORS);
         dataSet.setValueTextSize(12f);
         dataSet.setValueTextColor(Color.WHITE);
-
         PieData data = new PieData(dataSet);
         pieChart.setData(data);
         pieChart.getDescription().setEnabled(false);

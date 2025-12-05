@@ -15,7 +15,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // ----------------------------------------------------------------------
-    // 1. DECLARE TABLE AND COLUMN CONSTANTS (CATEGORY REMOVED)
+    // 1. DECLARE TABLE AND COLUMN CONSTANTS
     // ----------------------------------------------------------------------
 
     // Table 1: USERS
@@ -27,24 +27,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_CREATED_AT = "created_at";
     public static final String COL_VERIFY_CODE = "codeVerify";
 
-    // Table 2: TRANSACTION (MODIFIED: Removed Category FK)
+    // Table 2: TRANSACTION
     public static final String TABLE_TRANSACTION = "TransactionTable";
     public static final String COL_TRANS_ID = "transactionId";
     public static final String COL_TRANS_AMOUNT = "amount";
     public static final String COL_TRANS_DESC = "description";
     public static final String COL_TRANS_DATE = "transactionDate";
     public static final String COL_TRANS_TYPE = "type";
-    public static final String COL_TRANS_CAT_NAME = "category"; // ⭐ Keep Category Name in transaction table
+    public static final String COL_TRANS_CAT_NAME = "category";
 
-    // Table 3: BUDGET_LIMIT (MODIFIED: Removed Category FK)
+    // Table 3: BUDGET_LIMIT
     public static final String TABLE_BUDGET = "BudgetLimit";
     public static final String COL_BUDGET_ID = "budgetLimitId";
     public static final String COL_BUDGET_MAX = "maxAmount";
     public static final String COL_MONTH = "month";
     public static final String COL_YEAR = "year";
-    public static final String COL_BUDGET_CAT_NAME = "category"; // ⭐ Keep Category Name in Budget table
+    public static final String COL_BUDGET_CAT_NAME = "category";
 
-    // Table 4: RECURRING_EXPENSE (MODIFIED: Removed Category FK)
+    // Table 4: RECURRING_EXPENSE
     public static final String TABLE_RECURRING = "RecurringExpense";
     public static final String COL_RECUR_ID = "recurringId";
     public static final String COL_RECUR_AMOUNT = "amount";
@@ -52,7 +52,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_START_DATE = "startDate";
     public static final String COL_END_DATE = "endDate";
     public static final String COL_STATUS = "status";
-    public static final String COL_RECUR_CAT_NAME = "category"; // ⭐ Keep Category Name in Recurring table
+    public static final String COL_RECUR_CAT_NAME = "category";
 
     // Table 5: NOTIFICATION
     public static final String TABLE_NOTIFICATION = "Notification";
@@ -63,7 +63,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_IS_READ = "is_read";
 
     // ----------------------------------------------------------------------
-    // 2. CREATE TABLE STATEMENTS (CATEGORY FOREIGN KEY REMOVED)
+    // 2. CREATE TABLE STATEMENTS
     // ----------------------------------------------------------------------
 
     private static final String CREATE_TABLE_USER =
@@ -80,7 +80,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_TRANSACTION + " (" +
                     COL_TRANS_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COL_USER_ID + " INTEGER NOT NULL, " +
-                    COL_TRANS_CAT_NAME + " TEXT NOT NULL, " + // ⭐ Use Category Name instead of ID
+                    COL_TRANS_CAT_NAME + " TEXT NOT NULL, " +
                     COL_TRANS_AMOUNT + " REAL NOT NULL, " +
                     COL_TRANS_DESC + " TEXT, " +
                     COL_TRANS_DATE + " TEXT NOT NULL, " +
@@ -92,7 +92,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_BUDGET + " (" +
                     COL_BUDGET_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COL_USER_ID + " INTEGER NOT NULL, " +
-                    COL_BUDGET_CAT_NAME + " TEXT NOT NULL, " + // ⭐ Use Category Name instead of ID
+                    COL_BUDGET_CAT_NAME + " TEXT NOT NULL, " +
                     COL_BUDGET_MAX + " REAL NOT NULL, " +
                     COL_MONTH + " INTEGER, " +
                     COL_YEAR + " INTEGER, " +
@@ -103,7 +103,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + TABLE_RECURRING + " (" +
                     COL_RECUR_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COL_USER_ID + " INTEGER NOT NULL, " +
-                    COL_RECUR_CAT_NAME + " TEXT NOT NULL, " + // ⭐ Use Category Name instead of ID
+                    COL_RECUR_CAT_NAME + " TEXT NOT NULL, " +
                     COL_RECUR_AMOUNT + " REAL NOT NULL, " +
                     COL_FREQUENCY + " TEXT, " +
                     COL_START_DATE + " TEXT NOT NULL, " +
@@ -191,42 +191,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    // Save verification code
-    public boolean setVerifyCode(String email, String code) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COL_VERIFY_CODE, code);
-        String[] whereArgs = {email};
-        int rowsAffected = 0;
-        try {
-            rowsAffected = db.update(TABLE_USER, values, COL_EMAIL + " = ?", whereArgs);
-        } finally {
-            db.close();
-        }
-        return rowsAffected > 0;
-    }
-
-    // Clear verification code
-    public boolean clearVerifyCode(String email) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COL_VERIFY_CODE, "");
-        int rowsAffected = 0;
-        try {
-            rowsAffected = db.update(TABLE_USER, values, COL_EMAIL + " = ?", new String[]{email});
-        } finally {
-            db.close();
-        }
-        return rowsAffected > 0;
-    }
-
     // Check if Email exists
     public boolean checkUserExists(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
         boolean exists = false;
         try {
-            cursor = db.rawQuery("SELECT * FROM " + TABLE_USER + " WHERE " + COL_EMAIL + " = ?", new String[]{email});
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_USER +
+                    " WHERE " + COL_EMAIL + " = ?", new String[]{email});
             exists = cursor.getCount() > 0;
         } finally {
             if (cursor != null) cursor.close();
@@ -296,11 +268,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<Transaction> getTransactionsByMonth(int userId, int month, int year) {
         List<Transaction> transactionList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-
         // Format month to "01", "02"... for string comparison
         String monthStr = String.format("%02d", month);
         String yearStr = String.valueOf(year);
-
         // Query: Get all transactions of User, filter by Month and Year from Date string (YYYY-MM-DD)
         // Use strftime to extract month and year from date column
         String query = "SELECT * FROM " + TABLE_TRANSACTION +
@@ -308,9 +278,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " AND strftime('%m', " + COL_TRANS_DATE + ") = ? " +
                 " AND strftime('%Y', " + COL_TRANS_DATE + ") = ? " +
                 " ORDER BY " + COL_TRANS_DATE + " DESC"; // Sort newest first
-
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), monthStr, yearStr});
-
         if (cursor.moveToFirst()) {
             do {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_TRANS_ID));
@@ -319,14 +287,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String desc = cursor.getString(cursor.getColumnIndexOrThrow(COL_TRANS_DESC));
                 String date = cursor.getString(cursor.getColumnIndexOrThrow(COL_TRANS_DATE));
                 String type = cursor.getString(cursor.getColumnIndexOrThrow(COL_TRANS_TYPE));
-
                 // Add to list
                 transactionList.add(new Transaction(id, amount, category, desc, date, type));
             } while (cursor.moveToNext());
         }
-
         cursor.close();
-        // db.close(); // Keep open if needed immediately
         return transactionList;
     }
 
@@ -352,13 +317,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean deleteTransaction(int transactionId) {
         SQLiteDatabase db = this.getWritableDatabase();
         // DELETE FROM TransactionTable WHERE transactionId = ?
-        int result = db.delete(TABLE_TRANSACTION, COL_TRANS_ID + "=?", new String[]{String.valueOf(transactionId)});
+        int result = db.delete(TABLE_TRANSACTION, COL_TRANS_ID + "=?",
+                new String[]{String.valueOf(transactionId)});
         db.close();
         return result > 0;
     }
 
     // 2. Update Transaction Function
-    public boolean updateTransaction(int transactionId, int userId, double amount, String category, String note, String date, String type) {
+    public boolean updateTransaction(int transactionId, int userId, double amount, String category,
+                                     String note, String date, String type) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
@@ -370,7 +337,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COL_TRANS_TYPE, type);
 
         // UPDATE TransactionTable SET ... WHERE transactionId = ?
-        int result = db.update(TABLE_TRANSACTION, values, COL_TRANS_ID + "=?", new String[]{String.valueOf(transactionId)});
+        int result = db.update(TABLE_TRANSACTION, values, COL_TRANS_ID + "=?",
+                new String[]{String.valueOf(transactionId)});
         db.close();
         return result > 0;
     }
@@ -441,7 +409,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(COL_YEAR, year);
 
         // Check if record already exists
-        String whereClause = COL_USER_ID + "=? AND " + COL_BUDGET_CAT_NAME + "=? AND " + COL_MONTH + "=? AND " + COL_YEAR + "=?";
+        String whereClause = COL_USER_ID + "=? AND " + COL_BUDGET_CAT_NAME + "=? AND " +
+                COL_MONTH + "=? AND " + COL_YEAR + "=?";
         String[] whereArgs = {String.valueOf(userId), category, String.valueOf(month), String.valueOf(year)};
 
         int rows = db.update(TABLE_BUDGET, cv, whereClause, whereArgs);
@@ -487,7 +456,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean deleteBudget(int budgetId) {
         SQLiteDatabase db = this.getWritableDatabase();
         // DELETE FROM BudgetLimit WHERE budgetLimitId = ?
-        int result = db.delete(TABLE_BUDGET, COL_BUDGET_ID + "=?", new String[]{String.valueOf(budgetId)});
+        int result = db.delete(TABLE_BUDGET, COL_BUDGET_ID + "=?",
+                new String[]{String.valueOf(budgetId)});
         db.close();
         return result > 0;
     }
@@ -709,7 +679,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (currentTotal > limit) {
                 // Create detailed notification content
                 String message = String.format(java.util.Locale.US,
-                        "Category '%s' exceeded budget for month %02d/%d.\n\nSpent: %,.0f VND\nLimit: %,.0f VND\nExceeded by: %,.0f VND",
+                        "Category '%s' exceeded budget for month %02d/%d.\n\nSpent: %,.0f VND\n" +
+                                "Limit: %,.0f VND\nExceeded by: %,.0f VND",
                         category, month, year, currentTotal, limit, (currentTotal - limit));
 
                 // Get current time to save to notification history

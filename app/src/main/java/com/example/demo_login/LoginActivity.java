@@ -55,7 +55,6 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(this, "Please enter email and password!", Toast.LENGTH_SHORT).show();
             return;
         }
-
         // 2. Check credentials with DatabaseHelper
         int userId = dbHelper.checkCredentials(email, pass);
 

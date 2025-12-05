@@ -173,7 +173,6 @@ public class MainActivity extends AppCompatActivity {
     private void handleEnter() {
         String amountStr = etExpenseValue.getText().toString().trim();
         String note = edtNote.getText().toString().trim();
-
         if (amountStr.isEmpty()) {
             Toast.makeText(this, "Please enter amount!", Toast.LENGTH_SHORT).show();
             return;
@@ -182,14 +181,12 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Please select a category!", Toast.LENGTH_SHORT).show();
             return;
         }
-
         try {
             double amount = Double.parseDouble(amountStr);
             String categoryText = selectedCategoryRadioButton.getText().toString();
             String transType = isExpenseSelected ? "expense" : "income";
             SimpleDateFormat sdfDB = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
             String transactionDate = sdfDB.format(currentCalendar.getTime());
-
             boolean success;
             if (isEditMode) {
                 success = dbHelper.updateTransaction(
@@ -198,15 +195,12 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 success = addTransaction(currentUserId, amount, categoryText, note, transactionDate, transType);
             }
-
             if (success) {
                 String warningMessage = null;
-
                 // Only check budget limit if type is Expense
                 if ("expense".equalsIgnoreCase(transType)) {
                     warningMessage = dbHelper.checkAndNotifyBudgetExceeded(currentUserId, categoryText, transactionDate);
                 }
-
                 if (warningMessage != null) {
                     // 🚨 Alert exists -> Show Dialog -> Wait for User OK to navigate
                     showBudgetWarningDialog(warningMessage);
@@ -219,14 +213,11 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Database Error!", Toast.LENGTH_SHORT).show();
             }
-
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Invalid Amount!", Toast.LENGTH_SHORT).show();
         }
     }
-
     // --- 8. UI HELPER FUNCTIONS ---
-
     private void showBudgetWarningDialog(String message) {
         new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("⚠️ BUDGET ALERT")

@@ -71,22 +71,18 @@ public class ExpenseActivity extends AppCompatActivity implements TransactionAda
     private void loadDataForMonth() {
         int month = currentCalendar.get(Calendar.MONTH) + 1;
         int year = currentCalendar.get(Calendar.YEAR);
-
         List<Transaction> list = dbHelper.getTransactionsByMonth(currentUserId, month, year);
-
         if (adapter == null) {
             adapter = new TransactionAdapter(this, list, this);
             recyclerView.setAdapter(adapter);
         } else {
             adapter.updateData(list);
         }
-
         // Dashboard
         double[] totals = dbHelper.getMonthlyTotals(currentUserId, month, year);
         double income = totals[0];
         double expense = totals[1];
         double balance = income - expense;
-
         NumberFormat fmt = NumberFormat.getInstance(Locale.US);
         tvTotalIncome.setText(fmt.format(income));
         tvTotalExpense.setText(fmt.format(expense));

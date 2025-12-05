@@ -46,48 +46,36 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         String enteredCode = etRestoreCode.getText().toString().trim();
         String newPass = etNewPassword.getText().toString().trim();
         String verifyNewPass = etVerifyNewPassword.getText().toString().trim();
-
         // 1. Check null
         if (email.isEmpty() || enteredCode.isEmpty() || newPass.isEmpty() || verifyNewPass.isEmpty()) {
             Toast.makeText(this, "Please enter all information!", Toast.LENGTH_SHORT).show();
             return;
         }
-
         // 2. Check exists email
         if (!dbHelper.checkUserExists(email)) {
             Toast.makeText(this, "Email do not exist in system.", Toast.LENGTH_SHORT).show();
             return;
         }
-
         // 3. Take code from SQLite
         String storedCode = dbHelper.getVerifyCode(email);
-
         // 4. Check code verify to reset password
         if (storedCode == null || storedCode.isEmpty()) {
             Toast.makeText(this, "Code restore is not found.", Toast.LENGTH_SHORT).show();
             return;
         }
-
         if (!enteredCode.equals(storedCode)) {
             Toast.makeText(this, "Code restore is incorrect.", Toast.LENGTH_SHORT).show();
             return;
         }
-
         // 5. Check new password and verify new password
         if (!newPass.equals(verifyNewPass)) {
             Toast.makeText(this, "New password and verify password are not the same!", Toast.LENGTH_SHORT).show();
             return;
         }
-
         // 6. Update password in SQLite
         boolean updateSuccess = dbHelper.updatePassword(email, newPass);
-
         if (updateSuccess) {
-            // 7. Delete code verify after reset password
-            dbHelper.clearVerifyCode(email);
-
             Toast.makeText(this, "Password has been reset successfully!", Toast.LENGTH_LONG).show();
-
             // Back to Login
             Intent intent = new Intent(ForgotPasswordActivity.this, LoginActivity.class);
             startActivity(intent);
